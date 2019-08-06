@@ -10,7 +10,7 @@
 #pragma link C++ namespace PMTStyle+;
 #pragma link C++ namespace PMType+;
 
-
+#pragma link C++ class Pedestal+;
 #pragma link C++ class SPEResponse+;
 #pragma link C++ class PMT+;
 

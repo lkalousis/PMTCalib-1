@@ -12,13 +12,13 @@ PMT::PMT()
 PMT::~PMT()
 {}
 
-PMT::PMT( Int_t _nbins, Double_t _min, Double_t _max, SPEResponse _res ) // Pedestal _ped, PMTModel _mod )
+PMT::PMT( Int_t _nbins, Double_t _min, Double_t _max, Pedestal _ped, SPEResponse _res )
 {
   nbins = _nbins;
   min = _min;
   max = _max;
 
-  // ped = _ped;
+  ped = _ped;
   res = _res;
     
   spectrum = new TH1D( "hspectrum", "PMT spectrum; Charge in AU; Entries", nbins, min, max );
@@ -30,7 +30,7 @@ PMT::PMT( Int_t _nbins, Double_t _min, Double_t _max, SPEResponse _res ) // Pede
            
 }
 
-void PMT::GenSpectrum( Int_t ntot )//, Double_t mu )
+void PMT::GenSpectrum( Int_t ntot, Double_t mu )
 {
   spectrum->Reset();
    
@@ -38,15 +38,15 @@ void PMT::GenSpectrum( Int_t ntot )//, Double_t mu )
   
   for ( Int_t i=0; i<ntot; i++ )
     {
-      Double_t q = 0.0; //ped.GenQ();
+      Double_t q = ped.GenQ();
       
-      //Int_t npe = gRandom->Poisson( mu );
+      Int_t npe = gRandom->Poisson( mu );
       
-      //for ( Int_t j=0; j<ntot; j++ )
-      //{
+      for ( Int_t j=0; j<npe; j++ )
+	{
 	  q += res.GenQ();
 	  
-	  //	}
+	}
       
       spectrum->Fill( q );
       

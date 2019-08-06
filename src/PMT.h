@@ -11,6 +11,7 @@
 #include "TF1.h"
 #include "TRandom3.h"
 
+#include "Pedestal.h"
 #include "SPEResponse.h"
 
 class PMT : public TObject
@@ -23,7 +24,7 @@ class PMT : public TObject
   Double_t min;
   Double_t max;
   
-  //Pedestal ped;
+  Pedestal ped;
   SPEResponse res;
   
   
@@ -33,10 +34,9 @@ class PMT : public TObject
   
   virtual ~PMT();
   
-  PMT( Int_t _nbins, Double_t _min, Double_t _max, SPEResponse _res );
-  // Pedestal _ped ); , PMTModel _mod );
-    
-  void GenSpectrum( Int_t ntot );
+  PMT( Int_t _nbins, Double_t _min, Double_t _max, Pedestal _ped, SPEResponse _res );
+      
+  void GenSpectrum( Int_t ntot, Double_t mu );
   
   TH1D* GetSpectrum(){ return spectrum; };
   
