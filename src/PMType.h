@@ -4,7 +4,7 @@
 
 namespace PMType
 {
-  enum Response { GAUSSEXP, GAMMA };
+  enum Response { GAUSS, GAMMA };
   
   // enum Model { SIMPLEGAUSS, SIMPLEGAUSSEXP, FULLSIMPLEGAUSSEXP };
     
