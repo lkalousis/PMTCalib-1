@@ -42,7 +42,7 @@ SPEResponse::SPEResponse( PMType::Response _spetype, Double_t _params[] )
   spetype = _spetype;
     
   
-  if ( spetype==PMType::GAUSSEXP )
+  if ( spetype==PMType::GAUSS )
     {
       params[0] = _params[0];
       params[1] = _params[1];
