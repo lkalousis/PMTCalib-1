@@ -8,5 +8,6 @@
 #pragma link C++ nestedtypedefs;
 
 #pragma link C++ namespace PMTStyle+;
+#pragma link C++ namespace PMType+;
 
 #endif
