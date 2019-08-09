@@ -53,6 +53,8 @@ SPEResponse::SPEResponse( PMType::Response _spetype, Double_t _params[] )
       
       spefunc = new TF1( "spefunc", _gausexpfunc, params[0]-80.0*params[1], params[0]+80.0*params[1], 4 );
       spefunc->SetParameters( params[0], params[1], params[2], params[3] );
+
+      nparams = 4;
       
     }
    
@@ -60,6 +62,17 @@ SPEResponse::SPEResponse( PMType::Response _spetype, Double_t _params[] )
    spefunc->SetLineWidth( 2.0 );
    spefunc->SetNpx( 10000 );
     
+}
+
+void SPEResponse::SetParams( Double_t _params[] )
+{
+  for ( Int_t i=0; i<nparams; i++ )
+    {
+      params[i] = _params[i];
+      spefunc->SetParameter( i, params[i] );
+      
+    }
+      
 }
 
 Double_t SPEResponse::GetValue( Double_t xx )

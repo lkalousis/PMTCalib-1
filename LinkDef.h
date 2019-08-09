@@ -14,4 +14,6 @@
 #pragma link C++ class SPEResponse+;
 #pragma link C++ class PMT+;
 
+#pragma link C++ class DFTmethod+;
+
 #endif

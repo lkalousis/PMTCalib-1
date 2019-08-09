@@ -21,7 +21,7 @@ incflags += -I$(ROOTSYS)/include/ -I/$(GSL)/include/ -I/$(PMTCALIB)/src/
 
 so = g++
 soflags = -g -shared -fPIC
-libs = $(ROOTLIBS) -lMinuit -lMinuit2 -lGeom -lXMLIO -L/$(GSL)/ -lgsl -lgslcblas 
+libs = $(ROOTLIBS) -lMinuit -lMinuit2 -lGeom -lXMLIO -lfftw3 -L/$(GSL)/ -lgsl -lgslcblas 
 
 all	: start $(dict).cc $(objs) $(lib) end
 
@@ -32,7 +32,7 @@ start	:
 	@rm -f ./#* ./*~ ./*.*~	
 	@rm -f ./src/#* ./src/*~ ./src/*.*~
 	@rm -f ./mac/#* ./mac/*~ ./mac/*.*~
-	@mkdir -p lib work
+	@mkdir -p lib
 
 $(dict).cc : 
 	@rootcling -f $(dict).cc -s $(lib) -rml $(lib) -rmf $(rootmap) $(incflags) -c $(head) LinkDef.h 
