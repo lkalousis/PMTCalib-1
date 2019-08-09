@@ -24,7 +24,7 @@ PMT::PMT( Int_t _nbins, Double_t _min, Double_t _max, Pedestal _ped, SPEResponse
   spectrum = new TH1D( "hspectrum", "PMT spectrum; Charge in AU; Entries", nbins, min, max );
 
   spectrum->SetMarkerStyle( 20 );
-  spectrum->SetMarkerSize( 0.8 );
+  spectrum->SetMarkerSize( 0.75 );
   spectrum->SetLineColor( kBlack );
   spectrum->SetMarkerColor( kBlack );
            

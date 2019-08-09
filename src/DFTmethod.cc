@@ -95,7 +95,7 @@ void DFTmethod::SetHisto( TH1D* _h )
   Int_t N0 = _h->GetXaxis()->GetNbins();
   wbin = _h->GetXaxis()->GetBinWidth(1);
 
-  Int_t N1 = 2.0*N0+140.0; 
+  Int_t N1 = 4.0*N0; 
   lo_edge = _h->GetXaxis()->GetBinLowEdge( 1 );
   hi_edge = lo_edge + 1.0*N1*wbin;
   
@@ -106,7 +106,15 @@ void DFTmethod::SetHisto( TH1D* _h )
 
   //cout << " N : " << N << endl;
   //cout << " M : " << M << endl;
-    
+  
+  for ( Int_t i=0; i<N0; i++ )
+    {
+      Double_t xx = _h->GetXaxis()->GetBinCenter( i+1 );
+      Double_t yy = _h->GetBinContent( i+1 );
+      hdist->Fill( xx, yy );
+
+    }
+      
   hpred = new TH1D( "hpred", "", N, lo_edge, hi_edge );
     
   return;
