@@ -188,6 +188,9 @@ void DFTmethod::CalculateValues()
       
       
     }
+
+  cout << hpred->GetMean() << endl;
+  cout << hpred->GetRMS() << endl;
   
   return;
 
