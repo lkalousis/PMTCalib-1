@@ -34,13 +34,15 @@ class DFTmethod : public TObject
   SPEResponse spef;
 
   TH1D* hdist;
-
+  TH1D* hpred;
+    
   Double_t wbin;
+  Double_t lo_edge;
+  Double_t hi_edge;
+  
   unsigned int N;
   unsigned int M;
-
-  std::vector<Double_t> values;
-    
+      
   ROOT::Minuit2::Minuit2Minimizer *mFFT;
   
  public:

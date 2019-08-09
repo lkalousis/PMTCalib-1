@@ -67,13 +67,24 @@ double fit_func( const double *x )
 ClassImp( DFTmethod )
 
 DFTmethod::DFTmethod()
-{}
+{
+  hdist = NULL;
+  hpred = NULL;
+  
+    
+}
 
 DFTmethod::~DFTmethod()
-{}
+{
+  if ( hpred ) delete hpred;
+  
+}
 
 DFTmethod::DFTmethod( SPEResponse _spef )
 {
+  hdist = NULL;
+  hpred = NULL;
+  
   spef = _spef;
   spef0 = _spef;
     
@@ -81,22 +92,31 @@ DFTmethod::DFTmethod( SPEResponse _spef )
 
 void DFTmethod::SetHisto( TH1D* _h )
 {
-  hdist = _h;
+  Int_t N0 = _h->GetXaxis()->GetNbins();
+  wbin = _h->GetXaxis()->GetBinWidth(1);
 
-  wbin = hdist->GetXaxis()->GetBinWidth(1);
-
+  Int_t N1 = 2.0*N0+140.0; 
+  lo_edge = _h->GetXaxis()->GetBinLowEdge( 1 );
+  hi_edge = lo_edge + 1.0*N1*wbin;
+  
+  hdist = new TH1D( "hdist", "", N1, lo_edge, hi_edge );
+  
   N = hdist->GetXaxis()->GetNbins();
   M = N/2+1;
-    
+
   //cout << " N : " << N << endl;
   //cout << " M : " << M << endl;
-  
+    
+  hpred = new TH1D( "hpred", "", N, lo_edge, hi_edge );
+    
   return;
   
 };
 
 void DFTmethod::CalculateValues()
 {
+  hpred->Reset();
+  
   fftw_plan FWfftBG;
   fftw_plan FWfftSG;
   
@@ -124,44 +144,40 @@ void DFTmethod::CalculateValues()
   FWfftSG = fftw_plan_dft_r2c_1d( N, wfinSG, wfoutSG, FFTW_ESTIMATE );
   fftw_execute( FWfftSG );
   fftw_destroy_plan( FWfftSG );
-  
 
-  fftw_complex wfout[M];
-  Double_t fftout[N];
-  
-  for ( UInt_t i=0; i<M; i++ )
+  for ( Int_t n=0; n<=10; n++ )
     {
-      Double_t amp_BG = sqrt( pow( wfoutBG[i][0], 2.0 )+pow( wfoutBG[i][1], 2.0 ) );
-      Double_t amp_SG = sqrt( pow( wfoutSG[i][0], 2.0 )+pow( wfoutSG[i][1], 2.0 ) );
+      fftw_complex wfout[M];
+      Double_t fftout[N];
       
-      Double_t ph_BG = fftPhase( wfoutBG[i][1], wfoutBG[i][0] );
-      Double_t ph_SG = fftPhase( wfoutSG[i][1], wfoutSG[i][0] );
-            
-      //wfout[i][0] = amp_BG*( TMath::Cos( ph_BG )  + mu*amp_SG*TMath::Cos( ph_BG+ph_SG ) ); 
-      //wfout[i][1] = amp_BG*( TMath::Sin( ph_BG )  + mu*amp_SG*TMath::Sin( ph_BG+ph_SG ) );
-      
-      double ph = ( ph_BG+ph_SG );
-      double ph0 = fmod( ph, 2.0*TMath::Pi() );
-      if ( ph0>TMath::Pi() ) { ph0=ph0-2.0*TMath::Pi(); }
-      
-      wfout[i][0] = mu*amp_BG*amp_SG*TMath::Cos( ph0 );
-      wfout[i][1] = mu*amp_BG*amp_SG*TMath::Sin( ph0 );
-      
-      //wfout[i][0] = TMath::Exp( mu*wfoutSG[i][0] )*( wfoutBG[i][0]*TMath::Cos( mu*wfoutSG[i][1] ) - wfoutBG[i][1]*TMath::Sin( mu*wfoutSG[i][1] ) );
-      //wfout[i][1] = TMath::Exp( mu*wfoutSG[i][0] )*( wfoutBG[i][0]*TMath::Sin( mu*wfoutSG[i][1] ) + wfoutBG[i][1]*TMath::Cos( mu*wfoutSG[i][1] ) );
+      for ( UInt_t i=0; i<M; i++ )
+	{
+	  Double_t amp_BG = sqrt( pow( wfoutBG[i][0], 2.0 )+pow( wfoutBG[i][1], 2.0 ) );
+	  Double_t amp_SG = sqrt( pow( wfoutSG[i][0], 2.0 )+pow( wfoutSG[i][1], 2.0 ) );
+	  
+	  Double_t ph_BG = fftPhase( wfoutBG[i][1], wfoutBG[i][0] );
+	  Double_t ph_SG = fftPhase( wfoutSG[i][1], wfoutSG[i][0] );
+	  
+	  double ph = ( ph_BG + 1.0*n*ph_SG );
+	        
+	  wfout[i][0] = ( pow( mu, n )/TMath::Factorial( n ) ) * amp_BG * pow( amp_SG, n ) * TMath::Cos( ph ) * pow( wbin, n );
+	  wfout[i][1] = ( pow( mu, n )/TMath::Factorial( n ) ) * amp_BG * pow( amp_SG, n ) * TMath::Sin( ph ) * pow( wbin, n );
+	  
+	}
+        
+      fftw_plan BWfft;
+      BWfft = fftw_plan_dft_c2r_1d( N, wfout, fftout, FFTW_ESTIMATE );
+      fftw_execute( BWfft );
+      fftw_destroy_plan( BWfft );
 
-    }
-  
-  
-  fftw_plan BWfft;
-  BWfft = fftw_plan_dft_c2r_1d( N, wfout, fftout, FFTW_ESTIMATE );
-  fftw_execute( BWfft );
-  fftw_destroy_plan( BWfft );
-  
-  values.clear();
-  for ( UInt_t i=0; i<N; i++ )
-    {
-      values.push_back( Norm * wbin * TMath::Exp( -1.0*mu ) * fftout[i]/( 1.0*N*1.0 ) );
+      
+      for ( UInt_t i=0; i<N; i++ )
+	{
+	  Double_t x_ = hpred->GetBinCenter( i+1 ) + 1.0*n*lo_edge;
+	  hpred->Fill( x_, Norm * wbin * TMath::Exp( -1.0*mu ) * fftout[i]/( 1.0*N*1.0 ) );
+	  
+	}
+      
       
     }
   
@@ -174,7 +190,7 @@ TGraph* DFTmethod::GetGraph()
   CalculateValues();
   
   const UInt_t nsize = hdist->GetXaxis()->GetNbins();
-  cout << nsize << endl;
+  //cout << nsize << endl;
   
   Double_t x[nsize];
   Double_t y[nsize];
@@ -182,9 +198,11 @@ TGraph* DFTmethod::GetGraph()
   for ( UInt_t i=0; i<nsize; i++ )
     {
       x[i] = hdist->GetXaxis()->GetBinCenter( i+1 );
+
+      Double_t y_ = hpred->GetBinContent( i+1 );
       
-      if ( values.at(i)<1.0e-10 ) y[i] = 1.e-3;
-      else y[i] = values.at( i );
+      if ( y_<1.0e-10 ) y[i] = 1.e-3;
+      else y[i] = y_;
       //cout << i << ", " << x[i] << ", " << y[i] << endl;
 
     }
