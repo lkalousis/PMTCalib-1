@@ -34,8 +34,7 @@ class DFTmethod : public TObject
   SPEResponse spef;
 
   TH1D* hdist;
-  TH1D* hpred;
-    
+      
   Double_t wbin;
   Double_t lo_edge;
   Double_t hi_edge;
@@ -66,9 +65,11 @@ class DFTmethod : public TObject
   Double_t mu;
 
   Double_t fftPhase( Double_t vy, Double_t vz );
-    
-  void Fit();
   
+  void Fit();
+
+  Double_t vals[20];
+  Double_t errs[20];
   
   ClassDef( DFTmethod, 1 )
         

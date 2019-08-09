@@ -3,6 +3,8 @@
 
 using namespace std;
 
+int N00;
+
 int N0;
 int M0;
 
@@ -10,8 +12,37 @@ double xx0[2000];
 double yy0[2000];
 
 double wbin0;
-
 SPEResponse spef0;
+
+double lo_edge0;
+
+TH1D* hpred;
+
+Double_t fftPhase0( Double_t vy, Double_t vz )
+{
+  Double_t thetayz = -999.0;
+
+  if ( vz>0 && vy>0 ) { Double_t ratio=TMath::Abs( vy/vz ); thetayz=TMath::ATan( ratio ); }
+
+  else if ( vz<0 && vy>0 ) { Double_t ratio=TMath::Abs( vy/vz ); thetayz=TMath::ATan( ratio ); thetayz=3.14159-thetayz; }
+
+  else if ( vz<0 && vy<0 ) { Double_t ratio=TMath::Abs( vy/vz ); thetayz=TMath::ATan( ratio ); thetayz=thetayz+3.14159; }
+
+  else if ( vz>0 && vy<0 ) { Double_t ratio=TMath::Abs( vy/vz ); thetayz=TMath::ATan( ratio ); thetayz=2.0*3.14159-thetayz; }
+
+  else if ( vz==0 && vy>0 ) { thetayz=3.14159/2.0; }
+
+  else if ( vz==0 && vy<0 ) { thetayz=3.0*3.14159/2.0; }
+
+  else if ( vz>0 && vy==0 ) { thetayz=0.0; }
+
+  else if ( vz<0 && vy==0 ) { thetayz=3.14159; }
+
+  if ( thetayz>3.14159 ) { thetayz=thetayz-2.0*3.14159; }
+  
+  return thetayz;
+
+}
 
 double fit_func( const double *x )
 {
@@ -19,46 +50,90 @@ double fit_func( const double *x )
   
   double Norm = x[0]; 
   
-  double params0[20];
-  for( Int_t i=0; i<spef0.nparams; i++ ) params0[i] = x[i+1];
-  spef0.SetParams( params0 );
+  double Q0 = x[1];
+  double s0 = x[2];
 
+  double mu = x[3];
   
-  fftw_plan FWfft;
-  Double_t wfin[N0]; fftw_complex wfout[M0];
-    
+  double params0[20];
+  for( Int_t i=0; i<spef0.nparams; i++ ) params0[i] = x[i+4];
+  spef0.SetParams( params0 );
+  
+  
+  hpred->Reset();
+  
+  fftw_plan FWfftBG;
+  fftw_plan FWfftSG;
+  
+  Double_t wfinBG[N0]; fftw_complex wfoutBG[M0];
+  Double_t wfinSG[N0]; fftw_complex wfoutSG[M0];
+  
   for ( Int_t i=0; i<N0; i++ )
     {
-      Double_t xx = xx0[i];
-      wfin[i] = Norm*wbin0*spef0.GetValue( xx );
-            
+      Double_t xx = hpred->GetBinCenter( i+1 );
+
+      Double_t arg = 0.0; 
+      if ( s0!=0.0 ) arg = ( xx - Q0 )/s0;    
+      else cout << "Error: The code tries to divide by zero." << endl;
+      Double_t yy = 1.0/( sqrt( 2.0 * TMath::Pi() ) * s0 ) * TMath::Exp( -0.5*arg*arg );
+      wfinBG[i] = yy;
+      
+      wfinSG[i] = spef0.GetValue( xx );
+
     }
   
-  FWfft = fftw_plan_dft_r2c_1d( N0, wfin, wfout, FFTW_ESTIMATE );
-  fftw_execute( FWfft );
-  fftw_destroy_plan( FWfft );
+  FWfftBG = fftw_plan_dft_r2c_1d( N0, wfinBG, wfoutBG, FFTW_ESTIMATE );
+  fftw_execute( FWfftBG );
+  fftw_destroy_plan( FWfftBG );
+
+  FWfftSG = fftw_plan_dft_r2c_1d( N0, wfinSG, wfoutSG, FFTW_ESTIMATE );
+  fftw_execute( FWfftSG );
+  fftw_destroy_plan( FWfftSG );
   
-  
-  Double_t fftout[N0];
-  fftw_plan BWfft;
-  BWfft = fftw_plan_dft_c2r_1d( N0, wfout, fftout, FFTW_ESTIMATE );
-  fftw_execute( BWfft );
-  fftw_destroy_plan( BWfft );
-  
-  for ( Int_t i=0; i<N0; i++ )
+  for ( Int_t n=0; n<=10; n++ )
     {
-      fftout[i] = fftout[i]/( 1.0*N0*1.0 );
+      fftw_complex wfout[M0];
+      Double_t fftout[N0];
+      
+      for ( Int_t i=0; i<M0; i++ )
+	{
+	  Double_t amp_BG = sqrt( pow( wfoutBG[i][0], 2.0 )+pow( wfoutBG[i][1], 2.0 ) );
+	  Double_t amp_SG = sqrt( pow( wfoutSG[i][0], 2.0 )+pow( wfoutSG[i][1], 2.0 ) );
+	  
+	  Double_t ph_BG = fftPhase0( wfoutBG[i][1], wfoutBG[i][0] );
+	  Double_t ph_SG = fftPhase0( wfoutSG[i][1], wfoutSG[i][0] );
+	  
+	  double ph = ( ph_BG + 1.0*n*ph_SG );
+	        
+	  wfout[i][0] = ( pow( mu, n )/TMath::Factorial( n ) ) * amp_BG * pow( amp_SG, n ) * TMath::Cos( ph ) * pow( wbin0, n );
+	  wfout[i][1] = ( pow( mu, n )/TMath::Factorial( n ) ) * amp_BG * pow( amp_SG, n ) * TMath::Sin( ph ) * pow( wbin0, n );
+	  
+	}
+        
+      fftw_plan BWfft;
+      BWfft = fftw_plan_dft_c2r_1d( N0, wfout, fftout, FFTW_ESTIMATE );
+      fftw_execute( BWfft );
+      fftw_destroy_plan( BWfft );
+      
+      for ( Int_t i=0; i<N0; i++ )
+	{
+	  Double_t x_ = hpred->GetBinCenter( i+1 ) + 1.0*n*lo_edge0;
+	  hpred->Fill( x_, Norm * wbin0 * TMath::Exp( -1.0*mu ) * fftout[i]/( 1.0*N0*1.0 ) );
+	  
+	}
+      
+    }
+  
+  for ( Int_t i=0; i<N00; i++ )
+    {
+      Double_t val = hpred->GetBinContent( i+1 );
+
+      if ( val>1.0e-9 ) result += pow( val-yy0[i], 2.0 )/( val );
+      //if ( yy0[i]>0.0 ) result += 2.0*( yy0[i] - val + val*TMath::Log( val/yy0[i] ) );
+      //else result += 2.0*( yy0[i] - TMath::Abs( val ) ); 
       
     }
     
-  for ( Int_t i=0; i<N0; i++ )
-    {
-      //if ( fftout[i]>1.0e-9 ) result += pow( fftout[i]-yy0[i], 2.0 )/( fftout[i] );
-      if ( yy0[i]>0.0 ) result += 2.0*( yy0[i] - fftout[i] + fftout[i]*TMath::Log( fftout[i]/yy0[i] ) );
-      else result += 2.0*( yy0[i] - TMath::Abs( fftout[i] ) ); 
-            
-    }
-  
   return result;
   
 }
@@ -92,11 +167,12 @@ DFTmethod::DFTmethod( SPEResponse _spef )
 
 void DFTmethod::SetHisto( TH1D* _h )
 {
-  Int_t N0 = _h->GetXaxis()->GetNbins();
+  N00 = _h->GetXaxis()->GetNbins();
   wbin = _h->GetXaxis()->GetBinWidth(1);
 
-  Int_t N1 = 5.0*N0; 
+  Int_t N1 = 2.0*N00+40; 
   lo_edge = _h->GetXaxis()->GetBinLowEdge( 1 );
+  lo_edge0 = lo_edge;
   hi_edge = lo_edge + 1.0*N1*wbin;
   
   hdist = new TH1D( "hdist", "", N1, lo_edge, hi_edge );
@@ -107,7 +183,7 @@ void DFTmethod::SetHisto( TH1D* _h )
   //cout << " N : " << N << endl;
   //cout << " M : " << M << endl;
   
-  for ( Int_t i=0; i<N0; i++ )
+  for ( Int_t i=0; i<N00; i++ )
     {
       Double_t xx = _h->GetXaxis()->GetBinCenter( i+1 );
       Double_t yy = _h->GetBinContent( i+1 );
@@ -188,9 +264,9 @@ void DFTmethod::CalculateValues()
       
       
     }
-
-  cout << hpred->GetMean() << endl;
-  cout << hpred->GetRMS() << endl;
+  
+  //cout << hpred->GetMean() << endl;
+  //cout << hpred->GetRMS() << endl;
   
   return;
 
@@ -231,7 +307,7 @@ void DFTmethod::Fit()
 
   wbin0 = wbin;
   
-  for ( UInt_t i=0; i<N; i++ )
+  for ( Int_t i=0; i<N00; i++ )
     {
       xx0[i] = hdist->GetXaxis()->GetBinCenter(i+1);
       yy0[i] = hdist->GetBinContent(i+1);
@@ -241,15 +317,22 @@ void DFTmethod::Fit()
   mFFT = new ROOT::Minuit2::Minuit2Minimizer();
   
   ROOT::Math::Functor FCA;
-  FCA = ROOT::Math::Functor( &fit_func, spef.nparams+1 );
+  FCA = ROOT::Math::Functor( &fit_func, spef.nparams+4 );
   
   mFFT->SetFunction(FCA);
     
   mFFT->SetLimitedVariable( 0, "Norm", 1.0e+6, 1.0e+6*0.01, 1.0e+6*0.1, 1.0e+6*10.0 );
-  mFFT->SetLimitedVariable( 1, "Q", 50.0, 0.1, 10.0, 80.0 );
-  mFFT->SetLimitedVariable( 2, "s", 8.0, 0.1, 2.0, 40.0 );
-  mFFT->SetLimitedVariable( 3, "lambda", 20.0, 0.1, 5.0, 40.0 );
-  mFFT->SetLimitedVariable( 4, "w", 0.15, 0.01, 0.001, 0.8 );
+
+  mFFT->SetLimitedVariable( 1, "Q0", 0.0, 0.01, -2.0, +2.0 );
+  mFFT->SetLimitedVariable( 2, "s0", 2.0, 0.01, 0.8,  +4.0 );
+  
+  mFFT->SetLimitedVariable( 3, "mu", 0.5, 0.001, 0.01,  1.8 );
+  
+  
+  mFFT->SetLimitedVariable( 4, "Q", 50.0, 0.1, 10.0, 80.0 );
+  mFFT->SetLimitedVariable( 5, "s", 8.0, 0.1, 1.0, 50.0 );
+  mFFT->SetLimitedVariable( 6, "lambda", 20.0, 0.1, 1.0, 40.0 );
+  mFFT->SetLimitedVariable( 7, "w", 0.20, 0.001, 0.005, 0.5 );
   
   mFFT->SetMaxFunctionCalls(1.E9);
   mFFT->SetMaxIterations(1.E9);
@@ -290,8 +373,8 @@ void DFTmethod::Fit()
       cout << " * " << setw(10)  << mFFT->VariableName(i) << " : " << Form( "%.3f", pars[i] ) << " +/- " << Form( "%.3f", erpars[i] ) << endl; 
       cout << " * " << endl;
 
-      //vals[i]=pars[i];
-      //errs[i]=erpars[i];
+      vals[i]=pars[i];
+      errs[i]=erpars[i];
             
     }
   
@@ -300,6 +383,16 @@ void DFTmethod::Fit()
   
   delete pars;
   delete erpars;
+
+  Norm = vals[0];
+  
+  Q0 = vals[1];
+  s0 = vals[2];
+
+  mu = vals[3];
+
+  Double_t p[4] = { vals[4], vals[5], vals[6], vals[7] };
+  spef.SetParams( p );
   
   cout << "" << endl;
   
