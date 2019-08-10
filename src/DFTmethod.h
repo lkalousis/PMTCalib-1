@@ -16,33 +16,29 @@
 
 #include "fftw3.h"
 
-#include "TMinuit.h"
-#include "Minuit2/Minuit2Minimizer.h"
-#include "Minuit2/FunctionMinimum.h" 
-#include "Minuit2/MnMigrad.h" 
-#include "Minuit2/MnUserParameters.h" 
-#include "Minuit2/MnPrint.h" 
-#include "Minuit2/FCNBase.h" 
-#include "Math/Minimizer.h"
-#include "Math/Factory.h"
-#include "Math/Functor.h"
 
 class DFTmethod : public TObject
 {
  private:
 
-  SPEResponse spef;
-
-  TH1D* hdist;
-      
-  Double_t wbin;
-  Double_t lo_edge;
-  Double_t hi_edge;
+  Int_t nbins;
   
+  Double_t xmin;
+  Double_t xmax;
+
+  Double_t step;
+  
+  SPEResponse spef;
+    
   unsigned int N;
   unsigned int M;
-      
-  ROOT::Minuit2::Minuit2Minimizer *mFFT;
+  
+  std::vector<Double_t> xvalues;
+  std::vector<Double_t> yvalues;
+    
+  Double_t edge;
+
+  TGraph *gr;
   
  public:
   
@@ -50,27 +46,22 @@ class DFTmethod : public TObject
   
   virtual ~DFTmethod();
   
-  DFTmethod( SPEResponse _spef );
-
-  void SetHisto( TH1D* _h );
-    
-  void CalculateValues();
-  TGraph* GetGraph();
-
+  DFTmethod( Int_t _nbins, Double_t _xmin, Double_t _xmax, SPEResponse _spef );
+  
+  Double_t wbin;
+  
   Double_t Norm;
 
   Double_t Q0;
   Double_t s0;
 
   Double_t mu;
-
+  
   Double_t fftPhase( Double_t vy, Double_t vz );
-  
-  void Fit();
-
-  Double_t vals[20];
-  Double_t errs[20];
-  
+  void CalculateValues();
+  Double_t GetValue( Double_t xx );
+  TGraph* GetGraph();
+    
   ClassDef( DFTmethod, 1 )
         
 };

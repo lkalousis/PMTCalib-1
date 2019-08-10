@@ -3,216 +3,58 @@
 
 using namespace std;
 
-int N00;
-
-int N0;
-int M0;
-
-double xx0[2000];
-double yy0[2000];
-
-double wbin0;
-SPEResponse spef0;
-
-double lo_edge0;
-
-TH1D* hpred;
-
-Double_t fftPhase0( Double_t vy, Double_t vz )
-{
-  Double_t thetayz = -999.0;
-
-  if ( vz>0 && vy>0 ) { Double_t ratio=TMath::Abs( vy/vz ); thetayz=TMath::ATan( ratio ); }
-
-  else if ( vz<0 && vy>0 ) { Double_t ratio=TMath::Abs( vy/vz ); thetayz=TMath::ATan( ratio ); thetayz=3.14159-thetayz; }
-
-  else if ( vz<0 && vy<0 ) { Double_t ratio=TMath::Abs( vy/vz ); thetayz=TMath::ATan( ratio ); thetayz=thetayz+3.14159; }
-
-  else if ( vz>0 && vy<0 ) { Double_t ratio=TMath::Abs( vy/vz ); thetayz=TMath::ATan( ratio ); thetayz=2.0*3.14159-thetayz; }
-
-  else if ( vz==0 && vy>0 ) { thetayz=3.14159/2.0; }
-
-  else if ( vz==0 && vy<0 ) { thetayz=3.0*3.14159/2.0; }
-
-  else if ( vz>0 && vy==0 ) { thetayz=0.0; }
-
-  else if ( vz<0 && vy==0 ) { thetayz=3.14159; }
-
-  if ( thetayz>3.14159 ) { thetayz=thetayz-2.0*3.14159; }
-  
-  return thetayz;
-
-}
-
-double fit_func( const double *x )
-{
-  double result = 0.0;
-  
-  double Norm = x[0]; 
-  
-  double Q0 = x[1];
-  double s0 = x[2];
-
-  double mu = x[3];
-  
-  double params0[20];
-  for( Int_t i=0; i<spef0.nparams; i++ ) params0[i] = x[i+4];
-  spef0.SetParams( params0 );
-  
-  
-  hpred->Reset();
-  
-  fftw_plan FWfftBG;
-  fftw_plan FWfftSG;
-  
-  Double_t wfinBG[N0]; fftw_complex wfoutBG[M0];
-  Double_t wfinSG[N0]; fftw_complex wfoutSG[M0];
-  
-  for ( Int_t i=0; i<N0; i++ )
-    {
-      Double_t xx = hpred->GetBinCenter( i+1 );
-
-      Double_t arg = 0.0; 
-      if ( s0!=0.0 ) arg = ( xx - Q0 )/s0;    
-      else cout << "Error: The code tries to divide by zero." << endl;
-      Double_t yy = 1.0/( sqrt( 2.0 * TMath::Pi() ) * s0 ) * TMath::Exp( -0.5*arg*arg );
-      wfinBG[i] = yy;
-      
-      wfinSG[i] = spef0.GetValue( xx );
-
-    }
-  
-  FWfftBG = fftw_plan_dft_r2c_1d( N0, wfinBG, wfoutBG, FFTW_ESTIMATE );
-  fftw_execute( FWfftBG );
-  fftw_destroy_plan( FWfftBG );
-
-  FWfftSG = fftw_plan_dft_r2c_1d( N0, wfinSG, wfoutSG, FFTW_ESTIMATE );
-  fftw_execute( FWfftSG );
-  fftw_destroy_plan( FWfftSG );
-  
-  for ( Int_t n=0; n<=10; n++ )
-    {
-      fftw_complex wfout[M0];
-      Double_t fftout[N0];
-      
-      for ( Int_t i=0; i<M0; i++ )
-	{
-	  Double_t amp_BG = sqrt( pow( wfoutBG[i][0], 2.0 )+pow( wfoutBG[i][1], 2.0 ) );
-	  Double_t amp_SG = sqrt( pow( wfoutSG[i][0], 2.0 )+pow( wfoutSG[i][1], 2.0 ) );
-	  
-	  Double_t ph_BG = fftPhase0( wfoutBG[i][1], wfoutBG[i][0] );
-	  Double_t ph_SG = fftPhase0( wfoutSG[i][1], wfoutSG[i][0] );
-	  
-	  double ph = ( ph_BG + 1.0*n*ph_SG );
-	        
-	  wfout[i][0] = ( pow( mu, n )/TMath::Factorial( n ) ) * amp_BG * pow( amp_SG, n ) * TMath::Cos( ph ) * pow( wbin0, n );
-	  wfout[i][1] = ( pow( mu, n )/TMath::Factorial( n ) ) * amp_BG * pow( amp_SG, n ) * TMath::Sin( ph ) * pow( wbin0, n );
-	  
-	}
-        
-      fftw_plan BWfft;
-      BWfft = fftw_plan_dft_c2r_1d( N0, wfout, fftout, FFTW_ESTIMATE );
-      fftw_execute( BWfft );
-      fftw_destroy_plan( BWfft );
-      
-      for ( Int_t i=0; i<N0; i++ )
-	{
-	  Double_t x_ = hpred->GetBinCenter( i+1 ) + 1.0*n*lo_edge0;
-	  hpred->Fill( x_, Norm * wbin0 * TMath::Exp( -1.0*mu ) * fftout[i]/( 1.0*N0*1.0 ) );
-	  
-	}
-      
-    }
-  
-  for ( Int_t i=0; i<N00; i++ )
-    {
-      Double_t val = hpred->GetBinContent( i+1 );
-
-      if ( val>1.0e-9 ) result += pow( val-yy0[i], 2.0 )/( val );
-      //if ( yy0[i]>0.0 ) result += 2.0*( yy0[i] - val + val*TMath::Log( val/yy0[i] ) );
-      //else result += 2.0*( yy0[i] - TMath::Abs( val ) ); 
-      
-    }
-    
-  return result;
-  
-}
-
 
 ClassImp( DFTmethod )
 
 DFTmethod::DFTmethod()
-{
-  hdist = NULL;
-  hpred = NULL;
-  
-    
-}
+{}
 
 DFTmethod::~DFTmethod()
-{
-  if ( hpred ) delete hpred;
-  
-}
+{}
 
-DFTmethod::DFTmethod( SPEResponse _spef )
+DFTmethod::DFTmethod( Int_t _nbins, Double_t _xmin, Double_t _xmax, SPEResponse _spef )
 {
-  hdist = NULL;
-  hpred = NULL;
+  nbins = _nbins;
+
+  xmin = _xmin;
+  xmax = _xmax;
+
+  step = ( xmax-xmin )/( 1.0*nbins*1.0 );
   
   spef = _spef;
-  spef0 = _spef;
+
+  N = 2*nbins+2; 
+  M = N/2+1;
+    
+  xvalues.clear();
+  
+  for ( UInt_t i=0; i<N; i++ )
+    {
+      Double_t xx = xmin + step/2.0 + 1.0*i*step;
+      
+      xvalues.push_back( xx );
+      
+    }
+
+  edge = xmin + step/2.0;
+  
     
 }
-
-void DFTmethod::SetHisto( TH1D* _h )
-{
-  N00 = _h->GetXaxis()->GetNbins();
-  wbin = _h->GetXaxis()->GetBinWidth(1);
-
-  Int_t N1 = 2.0*N00+40; 
-  lo_edge = _h->GetXaxis()->GetBinLowEdge( 1 );
-  lo_edge0 = lo_edge;
-  hi_edge = lo_edge + 1.0*N1*wbin;
-  
-  hdist = new TH1D( "hdist", "", N1, lo_edge, hi_edge );
-  
-  N = hdist->GetXaxis()->GetNbins();
-  M = N/2+1;
-
-  //cout << " N : " << N << endl;
-  //cout << " M : " << M << endl;
-  
-  for ( Int_t i=0; i<N00; i++ )
-    {
-      Double_t xx = _h->GetXaxis()->GetBinCenter( i+1 );
-      Double_t yy = _h->GetBinContent( i+1 );
-      hdist->Fill( xx, yy );
-
-    }
-      
-  hpred = new TH1D( "hpred", "", N, lo_edge, hi_edge );
-    
-  return;
-  
-};
 
 void DFTmethod::CalculateValues()
 {
-  hpred->Reset();
-  
   fftw_plan FWfftBG;
   fftw_plan FWfftSG;
   
   Double_t wfinBG[N]; fftw_complex wfoutBG[M];
   Double_t wfinSG[N]; fftw_complex wfoutSG[M];
-    
+  
   for ( UInt_t i=0; i<N; i++ )
     {
-      Double_t xx = hdist->GetXaxis()->GetBinCenter( i+1 );
-
+      Double_t xx = xvalues.at( i ) - edge;
+      
       Double_t arg = 0.0; 
-      if ( s0!=0.0 ) arg = ( xx - Q0 )/s0;    
+      if ( s0!=0.0 ) arg = ( xx - Q0 + edge )/s0;    
       else cout << "Error: The code tries to divide by zero." << endl;
       Double_t yy = 1.0/( sqrt( 2.0 * TMath::Pi() ) * s0 ) * TMath::Exp( -0.5*arg*arg );
       wfinBG[i] = yy;
@@ -220,7 +62,7 @@ void DFTmethod::CalculateValues()
       wfinSG[i] = spef.GetValue( xx );
 
     }
-  
+
   FWfftBG = fftw_plan_dft_r2c_1d( N, wfinBG, wfoutBG, FFTW_ESTIMATE );
   fftw_execute( FWfftBG );
   fftw_destroy_plan( FWfftBG );
@@ -229,46 +71,60 @@ void DFTmethod::CalculateValues()
   fftw_execute( FWfftSG );
   fftw_destroy_plan( FWfftSG );
 
-  for ( Int_t n=0; n<=10; n++ )
-    {
-      fftw_complex wfout[M];
-      Double_t fftout[N];
-      
-      for ( UInt_t i=0; i<M; i++ )
-	{
-	  Double_t amp_BG = sqrt( pow( wfoutBG[i][0], 2.0 )+pow( wfoutBG[i][1], 2.0 ) );
-	  Double_t amp_SG = sqrt( pow( wfoutSG[i][0], 2.0 )+pow( wfoutSG[i][1], 2.0 ) );
-	  
-	  Double_t ph_BG = fftPhase( wfoutBG[i][1], wfoutBG[i][0] );
-	  Double_t ph_SG = fftPhase( wfoutSG[i][1], wfoutSG[i][0] );
-	  
-	  double ph = ( ph_BG + 1.0*n*ph_SG );
-	        
-	  wfout[i][0] = ( pow( mu, n )/TMath::Factorial( n ) ) * amp_BG * pow( amp_SG, n ) * TMath::Cos( ph ) * pow( wbin, n );
-	  wfout[i][1] = ( pow( mu, n )/TMath::Factorial( n ) ) * amp_BG * pow( amp_SG, n ) * TMath::Sin( ph ) * pow( wbin, n );
-	  
-	}
-        
-      fftw_plan BWfft;
-      BWfft = fftw_plan_dft_c2r_1d( N, wfout, fftout, FFTW_ESTIMATE );
-      fftw_execute( BWfft );
-      fftw_destroy_plan( BWfft );
 
+  fftw_complex wfout[M];
+  Double_t fftout[N];
+  
+  for ( UInt_t i=0; i<M; i++ )
+    {
+      Double_t amp_BG = sqrt( pow( wfoutBG[i][0], 2.0 )+pow( wfoutBG[i][1], 2.0 ) );
+      Double_t ph_BG = fftPhase( wfoutBG[i][1], wfoutBG[i][0] );
       
-      for ( UInt_t i=0; i<N; i++ )
-	{
-	  Double_t x_ = hpred->GetBinCenter( i+1 ) + 1.0*n*lo_edge;
-	  hpred->Fill( x_, Norm * wbin * TMath::Exp( -1.0*mu ) * fftout[i]/( 1.0*N*1.0 ) );
-	  
-	}
+      Double_t ReS = wfoutSG[i][0];
+      Double_t ImS = wfoutSG[i][1];
       
+      double ph = ( ph_BG + mu*ImS*step );
+      
+      wfout[i][0] = amp_BG*TMath::Exp( mu*ReS*step ) * TMath::Cos( ph );
+      wfout[i][1] = amp_BG*TMath::Exp( mu*ReS*step ) * TMath::Sin( ph );
       
     }
   
-  //cout << hpred->GetMean() << endl;
-  //cout << hpred->GetRMS() << endl;
+  fftw_plan BWfft;
+  BWfft = fftw_plan_dft_c2r_1d( N, wfout, fftout, FFTW_ESTIMATE );
+  fftw_execute( BWfft );
+  fftw_destroy_plan( BWfft );
+  
+  yvalues.clear();
+  for ( UInt_t i=0; i<N; i++ )
+    {
+      Double_t yy = Norm * wbin * TMath::Exp( -1.0*mu ) * fftout[i]/( 1.0*N*1.0 );
+      yvalues.push_back( yy );
+      
+    }
+  
+
+  Double_t x[nbins];
+  Double_t y[nbins];
+
+  for ( Int_t i=0; i<nbins; i++ )
+    {
+      x[i] = xvalues.at( i );
+      y[i] = yvalues.at( i );
+      
+    }
+
+  gr = new TGraph( nbins, x, y );
   
   return;
+  
+}
+
+Double_t DFTmethod::GetValue( Double_t xx )
+{
+  Double_t y_ = gr->Eval( xx ); 
+
+  return y_;
 
 }
 
@@ -276,152 +132,51 @@ TGraph* DFTmethod::GetGraph()
 {
   CalculateValues();
   
-  const UInt_t nsize = hdist->GetXaxis()->GetNbins();
-  //cout << nsize << endl;
+  Double_t x[nbins];
+  Double_t y[nbins];
   
-  Double_t x[nsize];
-  Double_t y[nsize];
-
-  for ( UInt_t i=0; i<nsize; i++ )
+  for ( Int_t i=0; i<nbins; i++ )
     {
-      x[i] = hdist->GetXaxis()->GetBinCenter( i+1 );
+      x[i] = xvalues.at( i );
 
-      Double_t y_ = hpred->GetBinContent( i+1 );
+      Double_t y_ = GetValue( x[i] );
       
       if ( y_<1.0e-10 ) y[i] = 1.e-3;
       else y[i] = y_;
-      //cout << i << ", " << x[i] << ", " << y[i] << endl;
-
+      
     }
   
-  TGraph *_gr = new TGraph( nsize, x, y );
+  TGraph *_gr = new TGraph( nbins, x, y );
   
   return _gr;
   
 }
-
-void DFTmethod::Fit()
-{
-  N0 = N;
-  M0 = M;
-
-  wbin0 = wbin;
   
-  for ( Int_t i=0; i<N00; i++ )
-    {
-      xx0[i] = hdist->GetXaxis()->GetBinCenter(i+1);
-      yy0[i] = hdist->GetBinContent(i+1);
-      
-    }
-  
-  mFFT = new ROOT::Minuit2::Minuit2Minimizer();
-  
-  ROOT::Math::Functor FCA;
-  FCA = ROOT::Math::Functor( &fit_func, spef.nparams+4 );
-  
-  mFFT->SetFunction(FCA);
-    
-  mFFT->SetLimitedVariable( 0, "Norm", 1.0e+6, 1.0e+6*0.01, 1.0e+6*0.1, 1.0e+6*10.0 );
-
-  mFFT->SetLimitedVariable( 1, "Q0", 0.0, 0.01, -2.0, +2.0 );
-  mFFT->SetLimitedVariable( 2, "s0", 2.0, 0.01, 0.8,  +4.0 );
-  
-  mFFT->SetLimitedVariable( 3, "mu", 0.5, 0.001, 0.01,  1.8 );
-  
-  
-  mFFT->SetLimitedVariable( 4, "Q", 50.0, 0.1, 10.0, 80.0 );
-  mFFT->SetLimitedVariable( 5, "s", 8.0, 0.1, 1.0, 50.0 );
-  mFFT->SetLimitedVariable( 6, "lambda", 20.0, 0.1, 1.0, 40.0 );
-  mFFT->SetLimitedVariable( 7, "w", 0.20, 0.001, 0.005, 0.5 );
-  
-  mFFT->SetMaxFunctionCalls(1.E9);
-  mFFT->SetMaxIterations(1.E9);
-  mFFT->SetTolerance(0.01);
-  mFFT->SetStrategy(2);
-  mFFT->SetErrorDef(1.0);
-  mFFT->Minimize();
-  mFFT->Hesse();
-  
-  Int_t ifits = 0;
-  while( mFFT->Status() != 0 && ifits < 5 )
-    { 
-      mFFT->Minimize();
-      mFFT->Hesse();
-      ifits++;
-      
-    }
-  
-  if( mFFT->Status() != 0 )
-    {
-      cout << "" << endl;
-      cout << " Fit has failed ! " << endl;
-      return;
-
-    }
-  
-
-  cout << " * " << endl;
-  cout << " * Minimization results, " << mFFT->NCalls() << endl;
-  cout << " * " << endl;
-  
-  Int_t ndim = mFFT->NDim();
-  const double *pars = mFFT->X();  
-  const double *erpars = mFFT->Errors();
-    
-  for ( int i=0; i<ndim; i++ )
-    {
-      cout << " * " << setw(10)  << mFFT->VariableName(i) << " : " << Form( "%.3f", pars[i] ) << " +/- " << Form( "%.3f", erpars[i] ) << endl; 
-      cout << " * " << endl;
-
-      vals[i]=pars[i];
-      errs[i]=erpars[i];
-            
-    }
-  
-  cout << " * " << setw(10) << "chi2/NDOF" << " : " << Form( "%.2f", mFFT->MinValue()/( N-spef.nparams-1 ) ) << endl;
-  cout << " * " << endl;
-  
-  delete pars;
-  delete erpars;
-
-  Norm = vals[0];
-  
-  Q0 = vals[1];
-  s0 = vals[2];
-
-  mu = vals[3];
-
-  Double_t p[4] = { vals[4], vals[5], vals[6], vals[7] };
-  spef.SetParams( p );
-  
-  cout << "" << endl;
-  
-
-  return;
-  
-}
 
 Double_t DFTmethod::fftPhase( Double_t vy, Double_t vz )
 {
   Double_t thetayz = -999.0;
-
+  
+  Double_t pi = TMath::Pi();
+  
+  
   if ( vz>0 && vy>0 ) { Double_t ratio=TMath::Abs( vy/vz ); thetayz=TMath::ATan( ratio ); }
 
-  else if ( vz<0 && vy>0 ) { Double_t ratio=TMath::Abs( vy/vz ); thetayz=TMath::ATan( ratio ); thetayz=3.14159-thetayz; }
+  else if ( vz<0 && vy>0 ) { Double_t ratio=TMath::Abs( vy/vz ); thetayz=TMath::ATan( ratio ); thetayz=pi-thetayz; }
 
-  else if ( vz<0 && vy<0 ) { Double_t ratio=TMath::Abs( vy/vz ); thetayz=TMath::ATan( ratio ); thetayz=thetayz+3.14159; }
+  else if ( vz<0 && vy<0 ) { Double_t ratio=TMath::Abs( vy/vz ); thetayz=TMath::ATan( ratio ); thetayz=thetayz+pi; }
 
-  else if ( vz>0 && vy<0 ) { Double_t ratio=TMath::Abs( vy/vz ); thetayz=TMath::ATan( ratio ); thetayz=2.0*3.14159-thetayz; }
+  else if ( vz>0 && vy<0 ) { Double_t ratio=TMath::Abs( vy/vz ); thetayz=TMath::ATan( ratio ); thetayz=2.0*pi-thetayz; }
 
-  else if ( vz==0 && vy>0 ) { thetayz=3.14159/2.0; }
+  else if ( vz==0 && vy>0 ) { thetayz=pi/2.0; }
 
-  else if ( vz==0 && vy<0 ) { thetayz=3.0*3.14159/2.0; }
+  else if ( vz==0 && vy<0 ) { thetayz=3.0*pi/2.0; }
 
   else if ( vz>0 && vy==0 ) { thetayz=0.0; }
 
-  else if ( vz<0 && vy==0 ) { thetayz=3.14159; }
-
-  if ( thetayz>3.14159 ) { thetayz=thetayz-2.0*3.14159; }
+  else if ( vz<0 && vy==0 ) { thetayz=pi; }
+  
+  thetayz = fmod( thetayz, 2.0*pi );
   
   return thetayz;
 
