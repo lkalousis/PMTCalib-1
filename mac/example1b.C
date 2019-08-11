@@ -8,11 +8,10 @@ R__LOAD_LIBRARY(libPMTCalib)
 #include "SPEResponse.h"
 #include "PMT.h"
 
-#include "DFTmethod.h"
-
+#include "PMTModel.h"
 #include "SPEFitter.h"
 
-Int_t example2()
+Int_t example1b()
 {
   time_t start;  
   
@@ -20,7 +19,7 @@ Int_t example2()
   
   cout << "" << endl;
   
-  cout << " The macro starts ( example2.C ) ... " << endl;
+  cout << " The macro starts ( example1b.C ) ... " << endl;
 
   cout << "" << endl;
 
@@ -56,30 +55,24 @@ Int_t example2()
   
   
   SPEFitter fit;
-
+  
+  PMTModel mod( 2.0*nbins, xmin, xmax, PMType::SIMPLEGAUSS2 );
+  mod.wbin = specimen.GetSpectrum()->GetBinWidth(1);
+  
   Double_t mu_test = fit.FindMu( specimen.GetSpectrum(), Q0, s0 );
   Double_t g_test = fit.FindG( specimen.GetSpectrum(), Q0, mu_test );
-
-  Double_t p_test[4] = { g_test, 0.3*g_test, 1.0/(0.5*g_test), 0.2 };
   
-  SPEResponse gaus_test( PMType::GAUSS, p_test );
-  DFTmethod dft( 2.0*nbins, xmin, xmax, gaus_test );
+  //Double_t p_test[8] = { 1.0*ntot*1.0, Q0, s0, mu, Q, s, alpha, w };
+  Double_t p_test[8] = { 1.0*ntot*1.0, Q0, s0, mu_test, g_test, 0.3*g_test, 1.0/(0.5*g_test), 0.2 };
+  mod.SetParams( p_test );
   
+  fit.SetPMTModel( mod );
+  fit.FitwPMTModel( specimen.GetSpectrum() );
   
-  dft.wbin = specimen.GetSpectrum()->GetBinWidth(1);
-  
-  dft.Norm = ntot;
-  
-  dft.Q0 = Q0;
-  dft.s0 = s0;
-  
-  dft.mu = mu_test;
-  
-  
-  fit.SetDFTmethod( dft );
-  fit.FitwDFTmethod( specimen.GetSpectrum() );
-  
-  TGraph *grBF = dft.GetGraph();
+  Double_t p_bf[8] = { fit.vals[0], fit.vals[1], fit.vals[2], fit.vals[3], fit.vals[4], fit.vals[5], fit.vals[6], fit.vals[7] };
+  mod.SetParams( p_bf );
+   
+  TGraph *grBF = mod.GetGraph();
   grBF->SetLineWidth( 2 );
   grBF->SetLineColor( kBlue );
   grBF->SetMarkerColor( kBlue );
@@ -97,7 +90,7 @@ Int_t example2()
   cout << "" << endl;
   
   
-
+  
   
   cout << " ... the macro ends ! " << endl;
 	  

@@ -37,7 +37,8 @@ class PMTModel : public TObject
   void SetParams( Double_t _params[] );
   Double_t GetValue( Double_t xx );
   
-  Double_t F1( Double_t xx ); // SIMPLE GAUSS
+  Double_t F1( Double_t xx ); // SIMPLE GAUSS 1
+  Double_t F2( Double_t xx ); // SIMPLE GAUSS 2
   
   TGraph* GetGraph();
   

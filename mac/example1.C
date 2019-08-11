@@ -36,8 +36,8 @@ Int_t example1()
   Double_t s0 = 2.0;
   Pedestal ped( Q0, s0 );
   
-  Double_t Q = 45.0;
-  Double_t s = 15.0;
+  Double_t Q = 40.0;
+  Double_t s = 14.0;
   Double_t alpha = 1.0/25.0;
   Double_t w = 0.2;
   Double_t p[4] = { Q, s, alpha, w };
@@ -48,27 +48,27 @@ Int_t example1()
   Double_t xmax = 480.0;
     
   PMT specimen( nbins, xmin, xmax, ped, gaus );
-  Double_t mu = 0.8;
-  Int_t ntot = 5.0e+5;
+  Double_t mu = 1.0;
+  Int_t ntot = 1.0e+6;
   specimen.GenSpectrum( ntot, mu );
   specimen.DrawSpectrum();
   
   
   SPEFitter fit;
   
-  PMTModel mod( 2.0*nbins, xmin, xmax, PMType::SIMPLEGAUSS );
+  PMTModel mod( 2.0*nbins, xmin, xmax, PMType::SIMPLEGAUSS1 );
   mod.wbin = specimen.GetSpectrum()->GetBinWidth(1);
   
   Double_t mu_test = fit.FindMu( specimen.GetSpectrum(), Q0, s0 );
   Double_t g_test = fit.FindG( specimen.GetSpectrum(), Q0, mu_test );
   
-  Double_t p_test[8] = { 1.0*ntot*1.0, Q0, s0, mu, Q, s, alpha, w };
-  //Double_t p_test[8] = { 1.0*ntot*1.0, Q0, s0, mu_test, g_test, 0.3*g_test, 1.0/(0.5*g_test), 0.2 };
+  //Double_t p_test[8] = { 1.0*ntot*1.0, Q0, s0, mu, Q, s, alpha, w };
+  Double_t p_test[8] = { 1.0*ntot*1.0, Q0, s0, mu_test, g_test, 0.3*g_test, 1.0/(0.5*g_test), 0.2 };
   mod.SetParams( p_test );
   
   fit.SetPMTModel( mod );
   fit.FitwPMTModel( specimen.GetSpectrum() );
-
+  
   Double_t p_bf[8] = { fit.vals[0], fit.vals[1], fit.vals[2], fit.vals[3], fit.vals[4], fit.vals[5], fit.vals[6], fit.vals[7] };
   mod.SetParams( p_bf );
    

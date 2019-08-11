@@ -6,7 +6,7 @@ namespace PMType
 {
   enum Response { GAUSS, GAMMA };
   
-  enum Model { SIMPLEGAUSS };
+  enum Model { SIMPLEGAUSS1, SIMPLEGAUSS2 };
     
   
 };

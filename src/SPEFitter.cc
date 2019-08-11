@@ -170,7 +170,7 @@ void SPEFitter::FitwDFTmethod( TH1D *hspec )
   
   mFFT->SetFunction(FCA);
 
-  mFFT->SetLimitedVariable( 0, "Norm", dft.Norm, dft.Norm*0.001, dft.Norm*0.75, dft.Norm*1.25 );
+  mFFT->SetLimitedVariable( 0, "Norm", dft.Norm, dft.Norm*0.001, dft.Norm*0.5, dft.Norm*2.0 );
 
   mFFT->SetLimitedVariable( 1, "Q0", dft.Q0, dft.Q0*0.01, dft.Q0*0.9, dft.Q0*1.1 );
   mFFT->SetLimitedVariable( 2, "s0", dft.s0, dft.s0*0.01, dft.s0*0.9, dft.s0*1.1 );
