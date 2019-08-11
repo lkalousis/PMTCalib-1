@@ -9,8 +9,8 @@ double yy0[7500];
 
 double wbin0;
 
-
 DFTmethod dft0;
+PMTModel mod0;
 
 double fit_func_fft( const double *x )
 {
@@ -38,6 +38,29 @@ double fit_func_fft( const double *x )
   for ( Int_t i=0; i<N; i++ )
     {
       Double_t val = dft0.GetValue( xx0[i] );
+      if ( val<1.0e-10 ) val = 1.0e-4;
+      
+      result += pow( val-yy0[i], 2.0 )/( val );
+            
+    }
+    
+  return result;
+  
+}
+
+double fit_func_mod( const double *x )
+{
+  double result = 0.0;
+
+  mod0.wbin = wbin0;
+      
+  double params0[20];
+  for( Int_t i=0; i<mod0.nparams; i++ ) params0[i] = x[i];
+  mod0.SetParams( params0 );
+  
+  for ( Int_t i=0; i<N; i++ )
+    {
+      Double_t val = mod0.GetValue( xx0[i] );
       if ( val<1.0e-10 ) val = 1.0e-4;
       
       result += pow( val-yy0[i], 2.0 )/( val );
@@ -82,6 +105,14 @@ void SPEFitter::SetDFTmethod( DFTmethod _dft )
   dft = _dft;
 
   dft0 = _dft;
+  
+}
+
+void SPEFitter::SetPMTModel( PMTModel _mod )
+{
+  mod = _mod;
+
+  mod0 = _mod;
   
 }
 
@@ -132,8 +163,6 @@ void SPEFitter::FitwDFTmethod( TH1D *hspec )
       
     }
   
-  mFFT = new ROOT::Minuit2::Minuit2Minimizer();
-
   mFFT = new ROOT::Minuit2::Minuit2Minimizer();
   
   ROOT::Math::Functor FCA;
@@ -203,7 +232,7 @@ void SPEFitter::FitwDFTmethod( TH1D *hspec )
             
     }
   
-  cout << " * " << setw(10) << "chi2/NDOF" << " : " << Form( "%.2f", mFFT->MinValue()/( N-dft.spef.nparams-1 ) ) << endl;
+  cout << " * " << setw(10) << "chi2/NDOF" << " : " << Form( "%.2f", mFFT->MinValue()/( N-8-1 ) ) << endl;
   cout << " * " << endl;
   
   delete pars;
@@ -223,6 +252,102 @@ void SPEFitter::FitwDFTmethod( TH1D *hspec )
   
   cout << "" << endl;
     
+  return;
+  
+}
+
+void SPEFitter::FitwPMTModel( TH1D *hspec )
+{
+  N = hspec->GetXaxis()->GetNbins();
+  wbin0 = hspec->GetXaxis()->GetBinWidth(1);
+  
+  for ( Int_t i=0; i<N; i++ )
+    {
+      xx0[i] = hspec->GetXaxis()->GetBinCenter( i+1 );
+      yy0[i] = hspec->GetBinContent( i+1 );
+      
+    }
+  
+  mMOD = new ROOT::Minuit2::Minuit2Minimizer();
+  
+  ROOT::Math::Functor FCA;
+  FCA = ROOT::Math::Functor( &fit_func_mod, 8 ); 
+  
+  mMOD->SetFunction(FCA);
+
+  mMOD->SetLimitedVariable( 0, "Norm", mod.params[0], mod.params[0]*0.001, mod.params[0]*0.1, mod.params[0]*10.0 );
+
+  mMOD->SetLimitedVariable( 1, "Q0", mod.params[1], mod.params[1]*0.01, mod.params[1]*0.9, mod.params[1]*1.1 );
+  mMOD->SetLimitedVariable( 2, "s0", mod.params[2], mod.params[2]*0.01, mod.params[2]*0.9, mod.params[2]*1.1 );
+  
+  mMOD->SetLimitedVariable( 3, "mu", mod.params[3], 0.01, mod.params[3]*0.1, mod.params[3]*2.0 );
+  
+  mMOD->SetLimitedVariable( 4, "PAR1", mod.params[4], mod.params[4]*0.001, mod.params[4]*0.1, mod.params[4]*5.0 );
+  mMOD->SetLimitedVariable( 5, "PAR2", mod.params[5], mod.params[5]*0.01, mod.params[5]*0.01, mod.params[5]*100.0 );
+  mMOD->SetLimitedVariable( 6, "PAR3", mod.params[6], mod.params[6]*0.01, mod.params[6]*0.01, mod.params[6]*100.0 );
+  mMOD->SetLimitedVariable( 7, "PAR4", mod.params[7], 0.01, 0.0, 0.5 );
+  
+  mMOD->SetMaxFunctionCalls(1.E9);
+  mMOD->SetMaxIterations(1.E9);
+  mMOD->SetTolerance(0.01);
+  mMOD->SetStrategy(2);
+  mMOD->SetErrorDef(1.0);
+  mMOD->Minimize();
+  mMOD->Hesse();
+  
+  
+  Int_t ifits = 0;
+  while( mMOD->Status()!=0 && ifits<10 )
+    { 
+      mMOD->Minimize();
+      mMOD->Hesse();
+      ifits++;
+      
+    }
+  
+  if( mMOD->Status()!=0 )
+    {
+      cout << " * " << endl;
+      cout << " * Fit has failed ! " << endl;
+      cout << " * " << endl;
+      
+      return;
+
+    }
+
+  
+  cout << " * " << endl;
+  cout << " * Minimization results "  << endl;
+  cout << " * " << endl;
+  cout << " * No. of calls  : " << mMOD->NCalls() << endl;
+  cout << " * Fitter status : " << mMOD->Status() << endl;
+  cout << " * " << endl;
+  
+  Int_t ndim = mMOD->NDim();
+  const double *pars = mMOD->X();  
+  const double *erpars = mMOD->Errors();
+    
+  for ( int i=0; i<ndim; i++ )
+    {
+      cout << " * " << setw(10)  << mMOD->VariableName(i) << " : " << Form( "%.3f", pars[i] ) << " +/- " << Form( "%.3f", erpars[i] ) << endl; 
+      cout << " * " << endl;
+
+      vals[i]=pars[i];
+      errs[i]=erpars[i];
+            
+    }
+  
+  cout << " * " << setw(10) << "chi2/NDOF" << " : " << Form( "%.2f", mMOD->MinValue()/( N-mod.nparams-1 ) ) << endl;
+  cout << " * " << endl;
+  
+  delete pars;
+  delete erpars;
+  
+  Double_t p[8] = { vals[0], vals[1], vals[2], vals[3], vals[4], vals[5], vals[6], vals[7] };
+  mod.SetParams( p );
+  
+  cout << "" << endl;
+  
   return;
   
 }

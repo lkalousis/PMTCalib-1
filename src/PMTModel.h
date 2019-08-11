@@ -18,9 +18,7 @@ class PMTModel : public TObject
   Double_t xmax;
 
   Double_t step;
-  
-  Double_t params[20]={-1.0};
-        
+          
  public:
   
   PMTModel();
@@ -32,7 +30,8 @@ class PMTModel : public TObject
   PMType::Model modtype;
   
   Int_t nparams;
-
+  Double_t params[20]={-1.0};
+  
   Double_t wbin;
   
   void SetParams( Double_t _params[] );

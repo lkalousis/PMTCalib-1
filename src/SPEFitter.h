@@ -8,6 +8,7 @@
 #include "TH1D.h"
 
 #include "DFTmethod.h"
+#include "PMTModel.h"
 
 #include "TMinuit.h"
 #include "Minuit2/Minuit2Minimizer.h"
@@ -27,7 +28,10 @@ class SPEFitter : public TObject
 
   DFTmethod dft;
   ROOT::Minuit2::Minuit2Minimizer *mFFT;
-
+    
+  PMTModel mod;
+  ROOT::Minuit2::Minuit2Minimizer *mMOD;
+  
   TF1 *ped_func;
   
  public:
@@ -45,9 +49,11 @@ class SPEFitter : public TObject
   void SetDFTmethod( DFTmethod _dft );
   void FitwDFTmethod( TH1D *hspec );
   
+  void SetPMTModel( PMTModel _mod );
+  void FitwPMTModel( TH1D *hspec );
   
   ClassDef( SPEFitter, 1 )
-        
+    
 };
 
 #endif
