@@ -27,9 +27,7 @@ class DFTmethod : public TObject
   Double_t xmax;
 
   Double_t step;
-  
-  SPEResponse spef;
-    
+      
   unsigned int N;
   unsigned int M;
   
@@ -47,6 +45,8 @@ class DFTmethod : public TObject
   virtual ~DFTmethod();
   
   DFTmethod( Int_t _nbins, Double_t _xmin, Double_t _xmax, SPEResponse _spef );
+
+  SPEResponse spef;
   
   Double_t wbin;
   
@@ -61,7 +61,7 @@ class DFTmethod : public TObject
   void CalculateValues();
   Double_t GetValue( Double_t xx );
   TGraph* GetGraph();
-    
+  
   ClassDef( DFTmethod, 1 )
         
 };

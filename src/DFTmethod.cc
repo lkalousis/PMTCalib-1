@@ -22,8 +22,8 @@ DFTmethod::DFTmethod( Int_t _nbins, Double_t _xmin, Double_t _xmax, SPEResponse 
   step = ( xmax-xmin )/( 1.0*nbins*1.0 );
   
   spef = _spef;
-
-  N = 2*nbins+2; 
+    
+  N = nbins+100; // Or N = 2*nbins+2;
   M = N/2+1;
     
   xvalues.clear();
@@ -103,7 +103,7 @@ void DFTmethod::CalculateValues()
       
     }
   
-
+  
   Double_t x[nbins];
   Double_t y[nbins];
 

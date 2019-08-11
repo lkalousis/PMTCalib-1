@@ -14,7 +14,6 @@ class SPEResponse : public TObject
 
   PMType::Response spetype;
     
-  Double_t params[10]={-1.0};
       
  public:
   
@@ -34,6 +33,7 @@ class SPEResponse : public TObject
 
   TF1 *spefunc;
 
+  Double_t params[10]={-1.0};
   
   ClassDef( SPEResponse, 1 )
     

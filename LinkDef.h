@@ -16,4 +16,6 @@
 
 #pragma link C++ class DFTmethod+;
 
+#pragma link C++ class SPEFitter+;
+
 #endif

@@ -32,7 +32,7 @@ start	:
 	@rm -f ./#* ./*~ ./*.*~	
 	@rm -f ./src/#* ./src/*~ ./src/*.*~
 	@rm -f ./mac/#* ./mac/*~ ./mac/*.*~
-	@mkdir -p lib
+	@mkdir -p lib work
 
 $(dict).cc : 
 	@rootcling -f $(dict).cc -s $(lib) -rml $(lib) -rmf $(rootmap) $(incflags) -c $(head) LinkDef.h 
