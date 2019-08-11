@@ -175,11 +175,11 @@ void SPEFitter::FitwDFTmethod( TH1D *hspec )
   mFFT->SetLimitedVariable( 1, "Q0", dft.Q0, dft.Q0*0.01, dft.Q0*0.9, dft.Q0*1.1 );
   mFFT->SetLimitedVariable( 2, "s0", dft.s0, dft.s0*0.01, dft.s0*0.9, dft.s0*1.1 );
   
-  mFFT->SetLimitedVariable( 3, "mu", dft.mu, 0.01, dft.mu*0.1, dft.mu*2.0 );
+  mFFT->SetLimitedVariable( 3, "mu", dft.mu, 0.01, dft.mu*0.1, dft.mu*2.5 );
   
   mFFT->SetLimitedVariable( 4, "PAR1", dft.spef.params[0], dft.spef.params[0]*0.001, dft.spef.params[0]*0.1, dft.spef.params[0]*5.0 );
-  mFFT->SetLimitedVariable( 5, "PAR2", dft.spef.params[1], dft.spef.params[1]*0.01, dft.spef.params[1]*0.1, dft.spef.params[1]*5.0 );
-  mFFT->SetLimitedVariable( 6, "PAR3", dft.spef.params[2], dft.spef.params[2]*0.01, dft.spef.params[2]*0.05, dft.spef.params[2]*50.0 );
+  mFFT->SetLimitedVariable( 5, "PAR2", dft.spef.params[1], dft.spef.params[1]*0.01, dft.spef.params[1]*0.01, dft.spef.params[1]*100.0 );
+  mFFT->SetLimitedVariable( 6, "PAR3", dft.spef.params[2], dft.spef.params[2]*0.01, dft.spef.params[2]*0.01, dft.spef.params[2]*100.0 );
   mFFT->SetLimitedVariable( 7, "PAR4", dft.spef.params[3], 0.01, 0.0, 0.5 );
   
   mFFT->SetMaxFunctionCalls(1.E9);
@@ -280,11 +280,11 @@ void SPEFitter::FitwPMTModel( TH1D *hspec )
   mMOD->SetLimitedVariable( 1, "Q0", mod.params[1], mod.params[1]*0.01, mod.params[1]*0.9, mod.params[1]*1.1 );
   mMOD->SetLimitedVariable( 2, "s0", mod.params[2], mod.params[2]*0.01, mod.params[2]*0.9, mod.params[2]*1.1 );
   
-  mMOD->SetLimitedVariable( 3, "mu", mod.params[3], 0.01, mod.params[3]*0.1, mod.params[3]*2.0 );
+  mMOD->SetLimitedVariable( 3, "mu", mod.params[3], 0.01, mod.params[3]*0.1, mod.params[3]*2.5 );
   
   mMOD->SetLimitedVariable( 4, "PAR1", mod.params[4], mod.params[4]*0.001, mod.params[4]*0.1, mod.params[4]*5.0 );
-  mMOD->SetLimitedVariable( 5, "PAR2", mod.params[5], mod.params[5]*0.01, mod.params[5]*0.1, mod.params[5]*5.0 );
-  mMOD->SetLimitedVariable( 6, "PAR3", mod.params[6], mod.params[6]*0.01, mod.params[6]*0.05, mod.params[6]*50.0 );
+  mMOD->SetLimitedVariable( 5, "PAR2", mod.params[5], mod.params[5]*0.01, mod.params[5]*0.01, mod.params[5]*100.0 );
+  mMOD->SetLimitedVariable( 6, "PAR3", mod.params[6], mod.params[6]*0.01, mod.params[6]*0.01, mod.params[6]*100.0 );
   mMOD->SetLimitedVariable( 7, "PAR4", mod.params[7], 0.01, 0.0, 0.5 );
   
   mMOD->SetMaxFunctionCalls(1.E9);
