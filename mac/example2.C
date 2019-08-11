@@ -49,7 +49,7 @@ Int_t example2()
   Double_t xmax = 480.0;
     
   PMT specimen( nbins, xmin, xmax, ped, gaus );
-  Double_t mu = 0.5;
+  Double_t mu = 1.5;
   Int_t ntot = 1.0e+6;
   specimen.GenSpectrum( ntot, mu );
   specimen.GetSpectrum()->SetStats(0);
@@ -60,8 +60,9 @@ Int_t example2()
 
   Double_t mu_test = fit.FindMu( specimen.GetSpectrum(), Q0, s0 );
   Double_t g_test = fit.FindG( specimen.GetSpectrum(), Q0, mu_test );
-
-  Double_t p_test[4] = { g_test, 0.3*g_test, 1.0/(0.5*g_test), 0.2 };
+  
+  //Double_t p_test[4] = { Q, s, alpha, w };
+  Double_t p_test[4] = { g_test, 0.3*g_test, 1.0/(0.2*g_test), 0.2 };
   
   SPEResponse gaus_test( PMType::GAUSS, p_test );
   DFTmethod dft( 2.0*nbins, xmin, xmax, gaus_test );
@@ -79,6 +80,16 @@ Int_t example2()
   
   fit.SetDFTmethod( dft );
   fit.FitwDFTmethod( specimen.GetSpectrum() );
+
+  dft.Norm = fit.vals[0];
+  
+  dft.Q0 = fit.vals[1];
+  dft.s0 = fit.vals[2];
+
+  dft.mu = fit.vals[3]; 
+  
+  Double_t p_fit[4] = { fit.vals[4], fit.vals[5], fit.vals[6], fit.vals[7] };
+  dft.spef.SetParams( p_fit );
   
   TGraph *grBF = dft.GetGraph();
   grBF->Draw( "SAME,L" );

@@ -32,7 +32,7 @@ double fit_func_fft( const double *x )
   double params0[20];
   for( Int_t i=0; i<dft0.spef.nparams; i++ ) params0[i] = x[i+4];
   dft0.spef.SetParams( params0 );
-
+  
   dft0.CalculateValues();
 
   for ( Int_t i=0; i<N; i++ )
@@ -170,15 +170,15 @@ void SPEFitter::FitwDFTmethod( TH1D *hspec )
   
   mFFT->SetFunction(FCA);
 
-  mFFT->SetLimitedVariable( 0, "Norm", dft.Norm, dft.Norm*0.01, dft.Norm*0.5, dft.Norm*2.0 );
+  mFFT->SetLimitedVariable( 0, "Norm", dft.Norm, dft.Norm*0.01, dft.Norm*0.5, dft.Norm*1.5 );
 
   mFFT->SetLimitedVariable( 1, "Q0", dft.Q0, dft.Q0*0.01, dft.Q0*0.9, dft.Q0*1.1 );
   mFFT->SetLimitedVariable( 2, "s0", dft.s0, dft.s0*0.01, dft.s0*0.9, dft.s0*1.1 );
   
-  mFFT->SetLimitedVariable( 3, "mu", dft.mu, 0.01, dft.mu*0.1, dft.mu*2.5 );
+  mFFT->SetLimitedVariable( 3, "mu", dft.mu, 0.01, dft.mu*0.1, dft.mu*3.0 );
   
   mFFT->SetLimitedVariable( 4, "PAR1", dft.spef.params[0], dft.spef.params[0]*0.001, dft.spef.params[0]*0.1, dft.spef.params[0]*5.0 );
-  mFFT->SetLimitedVariable( 5, "PAR2", dft.spef.params[1], dft.spef.params[1]*0.01, dft.spef.params[1]*0.01, dft.spef.params[1]*100.0 );
+  mFFT->SetLimitedVariable( 5, "PAR2", dft.spef.params[1], dft.spef.params[1]*0.01, dft.spef.params[1]*0.1, dft.spef.params[1]*10.0 );
   mFFT->SetLimitedVariable( 6, "PAR3", dft.spef.params[2], dft.spef.params[2]*0.01, dft.spef.params[2]*0.01, dft.spef.params[2]*100.0 );
   mFFT->SetLimitedVariable( 7, "PAR4", dft.spef.params[3], 0.01, 0.0, 0.5 );
   
@@ -234,22 +234,7 @@ void SPEFitter::FitwDFTmethod( TH1D *hspec )
   
   cout << " * " << setw(10) << "chi2/NDOF" << " : " << Form( "%.2f", mFFT->MinValue()/( N-8-1 ) ) << endl;
   cout << " * " << endl;
-  
-  delete pars;
-  delete erpars;
-
-  dft.wbin = wbin0;
     
-  dft.Norm = vals[0];
-  
-  dft.Q0 = vals[1];
-  dft.s0 = vals[2];
-
-  dft.mu = vals[3];
-
-  Double_t p[4] = { vals[4], vals[5], vals[6], vals[7] };
-  dft.spef.SetParams( p );
-  
   cout << "" << endl;
     
   return;
@@ -275,15 +260,15 @@ void SPEFitter::FitwPMTModel( TH1D *hspec )
   
   mMOD->SetFunction(FCA);
 
-  mMOD->SetLimitedVariable( 0, "Norm", mod.params[0], mod.params[0]*0.01, mod.params[0]*0.5, mod.params[0]*2.0 );
+  mMOD->SetLimitedVariable( 0, "Norm", mod.params[0], mod.params[0]*0.01, mod.params[0]*0.5, mod.params[0]*1.5 );
               
   mMOD->SetLimitedVariable( 1, "Q0", mod.params[1], mod.params[1]*0.01, mod.params[1]*0.9, mod.params[1]*1.1 );
   mMOD->SetLimitedVariable( 2, "s0", mod.params[2], mod.params[2]*0.01, mod.params[2]*0.9, mod.params[2]*1.1 );
   
-  mMOD->SetLimitedVariable( 3, "mu", mod.params[3], 0.01, mod.params[3]*0.1, mod.params[3]*2.5 );
+  mMOD->SetLimitedVariable( 3, "mu", mod.params[3], 0.01, mod.params[3]*0.1, mod.params[3]*3.0 );
   
   mMOD->SetLimitedVariable( 4, "PAR1", mod.params[4], mod.params[4]*0.001, mod.params[4]*0.1, mod.params[4]*5.0 );
-  mMOD->SetLimitedVariable( 5, "PAR2", mod.params[5], mod.params[5]*0.01, mod.params[5]*0.01, mod.params[5]*100.0 );
+  mMOD->SetLimitedVariable( 5, "PAR2", mod.params[5], mod.params[5]*0.01, mod.params[5]*0.1+0.001*mod.params[2], mod.params[5]*10.0 );
   mMOD->SetLimitedVariable( 6, "PAR3", mod.params[6], mod.params[6]*0.01, mod.params[6]*0.01, mod.params[6]*100.0 );
   mMOD->SetLimitedVariable( 7, "PAR4", mod.params[7], 0.01, 0.0, 0.5 );
   
@@ -339,10 +324,7 @@ void SPEFitter::FitwPMTModel( TH1D *hspec )
   
   cout << " * " << setw(10) << "chi2/NDOF" << " : " << Form( "%.2f", mMOD->MinValue()/( N-mod.nparams-1 ) ) << endl;
   cout << " * " << endl;
-  
-  delete pars;
-  delete erpars;
-  
+    
   Double_t p[8] = { vals[0], vals[1], vals[2], vals[3], vals[4], vals[5], vals[6], vals[7] };
   mod.SetParams( p );
   

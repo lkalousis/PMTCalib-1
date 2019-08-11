@@ -24,7 +24,7 @@ DFTmethod::DFTmethod( Int_t _nbins, Double_t _xmin, Double_t _xmax, SPEResponse 
   spef = _spef;
     
   N = nbins+60;
-  // Or N = 2*nbins+2;
+  //N = 2*nbins+2;
   M = N/2+1;
     
   xvalues.clear();
@@ -160,6 +160,8 @@ TGraph* DFTmethod::GetGraph()
 
 TGraph* DFTmethod::GetGraphN( Int_t n )
 {
+  CalculateValues();
+  
   fftw_plan FWfftBG;
   fftw_plan FWfftSG;
   
