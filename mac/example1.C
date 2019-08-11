@@ -38,7 +38,7 @@ Int_t example1()
   
   Double_t Q = 40.0;
   Double_t s = 14.0;
-  Double_t alpha = 1.0/25.0;
+  Double_t alpha = 1.0/15.0;
   Double_t w = 0.2;
   Double_t p[4] = { Q, s, alpha, w };
   SPEResponse gaus( PMType::GAUSS, p );
