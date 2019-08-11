@@ -39,7 +39,7 @@ Int_t example3()
   
   Double_t lambda = 1.0/40.0;
   Double_t theta = 6.5;
-  Double_t alpha = 1.0/23.0;
+  Double_t alpha = 1.0/8.0;
   Double_t w = 0.2;
   Double_t p[4] = { lambda, theta, alpha, w };
   SPEResponse gamma( PMType::GAMMA, p );
