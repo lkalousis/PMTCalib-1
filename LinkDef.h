@@ -15,6 +15,7 @@
 #pragma link C++ class PMT+;
 
 #pragma link C++ class DFTmethod+;
+#pragma link C++ class PMTModel+;
 
 #pragma link C++ class SPEFitter+;
 
