@@ -23,7 +23,8 @@ DFTmethod::DFTmethod( Int_t _nbins, Double_t _xmin, Double_t _xmax, SPEResponse 
   
   spef = _spef;
     
-  N = nbins+100; // Or N = 2*nbins+2;
+  N = nbins+60;
+  // Or N = 2*nbins+2;
   M = N/2+1;
     
   xvalues.clear();
