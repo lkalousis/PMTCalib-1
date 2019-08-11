@@ -40,8 +40,13 @@ class SPEFitter : public TObject
   
   virtual ~SPEFitter();
 
+  Int_t fit_status;
+  
   Double_t vals[20];
   Double_t errs[20];
+
+  Double_t ndof;
+  Double_t chi2r;
 
   Double_t FindMu( TH1D *hspec, Double_t _Q0, Double_t _s0 );
   Double_t FindG( TH1D *hspec, Double_t _Q0, Double_t _mu );

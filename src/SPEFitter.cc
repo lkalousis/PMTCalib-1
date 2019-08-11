@@ -210,12 +210,13 @@ void SPEFitter::FitwDFTmethod( TH1D *hspec )
 
     }
 
-
+  fit_status = mFFT->Status();
+  
   cout << " * " << endl;
   cout << " * Minimization results "  << endl;
   cout << " * " << endl;
   cout << " * No. of calls  : " << mFFT->NCalls() << endl;
-  cout << " * Fitter status : " << mFFT->Status() << endl;
+  cout << " * Fitter status : " << fit_status << endl;
   cout << " * " << endl;
   
   Int_t ndim = mFFT->NDim();
@@ -231,8 +232,12 @@ void SPEFitter::FitwDFTmethod( TH1D *hspec )
       errs[i]=erpars[i];
             
     }
+
+  ndof = N-dft.spef.nparams-4; 
+  cout << " * " << setw(10) << "NDOF" << " : " << ndof << endl;
   
-  cout << " * " << setw(10) << "chi2/NDOF" << " : " << Form( "%.2f", mFFT->MinValue()/( N-8-1 ) ) << endl;
+  chi2r = mFFT->MinValue()/( ndof );
+  cout << " * " << setw(10) << "chi2/NDOF" << " : " << Form( "%.2f", chi2r ) << endl;
   cout << " * " << endl;
     
   cout << "" << endl;
@@ -299,13 +304,14 @@ void SPEFitter::FitwPMTModel( TH1D *hspec )
       return;
 
     }
-
+  
+  fit_status = mMOD->Status();
   
   cout << " * " << endl;
   cout << " * Minimization results "  << endl;
   cout << " * " << endl;
   cout << " * No. of calls  : " << mMOD->NCalls() << endl;
-  cout << " * Fitter status : " << mMOD->Status() << endl;
+  cout << " * Fitter status : " << fit_status << endl;
   cout << " * " << endl;
   
   Int_t ndim = mMOD->NDim();
@@ -321,8 +327,12 @@ void SPEFitter::FitwPMTModel( TH1D *hspec )
       errs[i]=erpars[i];
             
     }
-  
-  cout << " * " << setw(10) << "chi2/NDOF" << " : " << Form( "%.2f", mMOD->MinValue()/( N-mod.nparams-1 ) ) << endl;
+
+  ndof = N-mod.nparams;
+  cout << " * " << setw(10) << "NDOF" << " : " << ndof << endl;
+
+  chi2r = mMOD->MinValue()/( ndof ); 
+  cout << " * " << setw(10) << "chi2/NDOF" << " : " << Form( "%.2f", chi2r ) << endl;
   cout << " * " << endl;
     
   Double_t p[8] = { vals[0], vals[1], vals[2], vals[3], vals[4], vals[5], vals[6], vals[7] };
