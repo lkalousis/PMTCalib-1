@@ -229,7 +229,7 @@ TGraph* DFTmethod::GetGraphN( Int_t n )
   TGraph *_gr = new TGraph( nbins, x, y );
 
   _gr->SetLineWidth( 2 );
-  _gr->SetLineStyle( 2 );
+  _gr->SetLineStyle( 3 );
   _gr->SetLineColor( kBlack );
   _gr->SetMarkerColor( kBlack );
   _gr->SetMarkerSize( 0.1 );
