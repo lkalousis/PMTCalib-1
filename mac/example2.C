@@ -1,0 +1,122 @@
+
+R__LOAD_LIBRARY(libPMTCalib)
+
+#include "PMTStyle.h"
+#include "PMType.h"
+
+#include "Pedestal.h"
+#include "SPEResponse.h"
+#include "PMT.h"
+
+#include "DFTmethod.h"
+
+#include "SPEFitter.h"
+
+Int_t example2()
+{
+  time_t start;  
+  
+  time( &start );
+  
+  cout << "" << endl;
+  
+  cout << " The macro starts ( example2.C ) ... " << endl;
+
+  cout << "" << endl;
+
+  gROOT->Reset();
+  
+  PMTStyle::SetDefaultStyle();
+
+  
+  TCanvas *c1 = new TCanvas( "c1", "" );
+  c1->cd();
+  c1->SetLogy();
+
+  Double_t Q0 = 0.0;
+  Double_t s0 = 2.0;
+  Pedestal ped( Q0, s0 );
+  
+  Double_t Q = 40.0;
+  Double_t s = 14.0;
+  Double_t lambda = 20.0;
+  Double_t w = 0.2;
+  Double_t p[4] = { Q, s, lambda, w };
+  SPEResponse gaus( PMType::GAUSS, p );
+
+  Int_t nbins = 250;
+  Double_t xmin = -20.0;
+  Double_t xmax = 480.0;
+    
+  PMT specimen( nbins, xmin, xmax, ped, gaus );
+  Double_t mu = 1.0;
+  Int_t ntot = 1.0e+6;
+  specimen.GenSpectrum( ntot, mu );
+  specimen.DrawSpectrum();
+  
+  
+  SPEFitter fit;
+
+  Double_t mu_test = fit.FindMu( specimen.GetSpectrum(), Q0, s0 );
+  Double_t g_test = fit.FindG( specimen.GetSpectrum(), Q0, mu_test );
+
+  Double_t p_test[4] = { g_test, 0.3*g_test, 0.5*g_test, 0.2 };
+  
+  SPEResponse gaus_test( PMType::GAUSS, p_test );
+  DFTmethod dft( 2.0*nbins, xmin, xmax, gaus_test );
+  
+  
+  dft.wbin = specimen.GetSpectrum()->GetBinWidth(1);
+  
+  dft.Norm = ntot;
+  
+  dft.Q0 = Q0;
+  dft.s0 = s0;
+  
+  dft.mu = mu_test;
+  
+  
+  fit.SetDFTmethod( dft );
+  fit.FitwDFTmethod( specimen.GetSpectrum() );
+  
+  TGraph *grBF = dft.GetGraph();
+  grBF->SetLineWidth( 2 );
+  grBF->SetLineColor( kBlue );
+  grBF->SetMarkerColor( kBlue );
+  grBF->SetMarkerSize( 0.1 );
+  grBF->Draw( "SAME,L" );
+  
+  Double_t Gtrue = ( w*lambda+(1.0-w)*Q );
+  Double_t Gfit = ( fit.vals[7]*fit.vals[6]+(1.0-fit.vals[7])*fit.vals[4] ); 
+  
+  cout << " True Gain : " << Gtrue << endl;
+  cout << " BF Gain   : " << Gfit  << endl;
+  cout << " Deviation : " << ( Gfit/Gtrue - 1.0 )*100.0 << endl;
+  
+  cout << "" << endl;
+  cout << "" << endl;
+  
+  
+
+  
+  cout << " ... the macro ends ! " << endl;
+	  
+  cout << "" << endl;
+  
+  time_t end;      
+  
+  time( &end );
+      
+  Int_t dura = difftime( end, start );      
+   
+  Int_t min = dura / 60; Int_t sec = dura % 60;
+    
+  cout << " ---> "<< Form( "%02d:%02d", min, sec ) << endl;  
+    
+  cout << "" << endl;
+
+  cout << "" << endl;
+    
+  return 0;
+  
+}
