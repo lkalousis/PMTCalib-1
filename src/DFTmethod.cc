@@ -152,7 +152,6 @@ TGraph* DFTmethod::GetGraph()
   return _gr;
   
 }
-  
 
 Double_t DFTmethod::fftPhase( Double_t vy, Double_t vz )
 {

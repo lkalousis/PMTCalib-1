@@ -3,6 +3,7 @@
 #define PMTMODEL_H
 
 #include "TObject.h"
+#include "TGraph.h"
 #include "TF1.h"
 
 #include "PMType.h"
@@ -11,6 +12,13 @@ class PMTModel : public TObject
 {
  private:
 
+  Int_t nbins;
+  
+  Double_t xmin;
+  Double_t xmax;
+
+  Double_t step;
+  
   Double_t params[20]={-1.0};
         
  public:
@@ -19,17 +27,20 @@ class PMTModel : public TObject
   
   virtual ~PMTModel();
 
-  PMTModel( PMType::Model _modtype );
+  PMTModel( Int_t _nbins, Double_t _xmin, Double_t _xmax, PMType::Model _modtype );
 
   PMType::Model modtype;
   
   Int_t nparams;
-   
+
+  Double_t wbin;
+  
   void SetParams( Double_t _params[] );
-  Double_t Value( Double_t xx );
+  Double_t GetValue( Double_t xx );
   
   Double_t F1( Double_t xx ); // SIMPLE GAUSS
-    
+  
+  TGraph* GetGraph();
   
   ClassDef( PMTModel, 1 )
     
