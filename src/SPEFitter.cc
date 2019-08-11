@@ -141,17 +141,17 @@ void SPEFitter::FitwDFTmethod( TH1D *hspec )
   
   mFFT->SetFunction(FCA);
 
-  mFFT->SetLimitedVariable( 0, "Norm", dft.Norm, dft.Norm*0.001, dft.Norm*0.5, dft.Norm*1.5 );
+  mFFT->SetLimitedVariable( 0, "Norm", dft.Norm, dft.Norm*0.001, dft.Norm*0.75, dft.Norm*1.25 );
 
   mFFT->SetLimitedVariable( 1, "Q0", dft.Q0, dft.Q0*0.01, dft.Q0*0.9, dft.Q0*1.1 );
   mFFT->SetLimitedVariable( 2, "s0", dft.s0, dft.s0*0.01, dft.s0*0.9, dft.s0*1.1 );
   
-  mFFT->SetLimitedVariable( 3, "mu", dft.mu, 0.01, dft.mu*0.5, dft.mu*2.0 );
+  mFFT->SetLimitedVariable( 3, "mu", dft.mu, 0.01, dft.mu*0.5, dft.mu*1.5 );
   
-  mFFT->SetLimitedVariable( 4, "Q", dft.spef.params[0], dft.spef.params[0]*0.001, dft.spef.params[0]*0.1, dft.spef.params[0]*10.0 );
-  mFFT->SetLimitedVariable( 5, "s", dft.spef.params[1], dft.spef.params[1]*0.001, dft.spef.params[1]*0.01, dft.spef.params[1]*100.0 );
-  mFFT->SetLimitedVariable( 6, "lambda", dft.spef.params[2], dft.spef.params[2]*0.001, dft.spef.params[2]*0.01, dft.spef.params[2]*100.0 );
-  mFFT->SetLimitedVariable( 7, "w", dft.spef.params[3], 0.01, 0.0, 0.5 );
+  mFFT->SetLimitedVariable( 4, "PAR1", dft.spef.params[0], dft.spef.params[0]*0.001, dft.spef.params[0]*0.1, dft.spef.params[0]*5.0 );
+  mFFT->SetLimitedVariable( 5, "PAR2", dft.spef.params[1], dft.spef.params[1]*0.01, dft.spef.params[1]*0.1, dft.spef.params[1]*5.0 );
+  mFFT->SetLimitedVariable( 6, "PAR3", dft.spef.params[2], dft.spef.params[2]*0.01, dft.spef.params[2]*0.05, dft.spef.params[2]*50.0 );
+  mFFT->SetLimitedVariable( 7, "PAR4", dft.spef.params[3], 0.01, 0.0, 0.5 );
   
   mFFT->SetMaxFunctionCalls(1.E9);
   mFFT->SetMaxIterations(1.E9);
