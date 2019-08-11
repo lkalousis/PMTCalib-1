@@ -60,8 +60,10 @@ class DFTmethod : public TObject
   Double_t fftPhase( Double_t vy, Double_t vz );
   void CalculateValues();
   Double_t GetValue( Double_t xx );
+
   TGraph* GetGraph();
-  
+  TGraph* GetGraphN( Int_t n );
+    
   ClassDef( DFTmethod, 1 )
         
 };

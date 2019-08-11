@@ -51,6 +51,7 @@ Int_t example1()
   Double_t mu = 1.2;
   Int_t ntot = 1.0e+6;
   specimen.GenSpectrum( ntot, mu );
+  specimen.GetSpectrum()->SetStats(0);
   specimen.DrawSpectrum();
   
   
@@ -73,10 +74,6 @@ Int_t example1()
   mod.SetParams( p_bf );
    
   TGraph *grBF = mod.GetGraph();
-  grBF->SetLineWidth( 2 );
-  grBF->SetLineColor( kBlue );
-  grBF->SetMarkerColor( kBlue );
-  grBF->SetMarkerSize( 0.1 );
   grBF->Draw( "SAME,L" );
   
   Double_t Gtrue = ( w*alpha+(1.0-w)*Q );

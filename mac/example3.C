@@ -52,6 +52,7 @@ Int_t example3()
   Double_t mu = 1.2;
   Int_t ntot = 1.0e+6;
   specimen.GenSpectrum( ntot, mu );
+  specimen.GetSpectrum()->SetStats(0);
   specimen.DrawSpectrum();
   
   
@@ -78,13 +79,20 @@ Int_t example3()
   
   fit.SetDFTmethod( dft );
   fit.FitwDFTmethod( specimen.GetSpectrum() );
+
   
   TGraph *grBF = dft.GetGraph();
-  grBF->SetLineWidth( 2 );
-  grBF->SetLineColor( kBlue );
-  grBF->SetMarkerColor( kBlue );
-  grBF->SetMarkerSize( 0.1 );
   grBF->Draw( "SAME,L" );
+
+  TGraph *grPE[10];
+    
+  for ( Int_t i=0; i<10; i++ )
+    {
+      grPE[i] = dft.GetGraphN( i );
+      grPE[i]->Draw( "SAME,L" );
+      
+    }
+
   
   Double_t Gtrue = ( w/alpha+(1.0-w)/lambda );
   Double_t Gfit = ( fit.vals[7]/fit.vals[6]+(1.0-fit.vals[7])/fit.vals[4] ); 

@@ -142,12 +142,97 @@ TGraph* DFTmethod::GetGraph()
 
       Double_t y_ = GetValue( x[i] );
       
-      if ( y_<1.0e-10 ) y[i] = 1.e-3;
+      if ( y_<1.0e-10 ) y[i] = 1.e-4;
       else y[i] = y_;
       
     }
   
   TGraph *_gr = new TGraph( nbins, x, y );
+
+  _gr->SetLineWidth( 2 );
+  _gr->SetLineColor( kBlue );
+  _gr->SetMarkerColor( kBlue );
+  _gr->SetMarkerSize( 0.1 );
+    
+  return _gr;
+  
+}
+
+TGraph* DFTmethod::GetGraphN( Int_t n )
+{
+  fftw_plan FWfftBG;
+  fftw_plan FWfftSG;
+  
+  Double_t wfinBG[N]; fftw_complex wfoutBG[M];
+  Double_t wfinSG[N]; fftw_complex wfoutSG[M];
+  
+  for ( UInt_t i=0; i<N; i++ )
+    {
+      Double_t xx = xvalues.at( i ) - edge;
+      
+      Double_t arg = 0.0; 
+      if ( s0!=0.0 ) arg = ( xx - Q0 + edge )/s0;    
+      else cout << "Error: The code tries to divide by zero." << endl;
+      Double_t yy = 1.0/( sqrt( 2.0 * TMath::Pi() ) * s0 ) * TMath::Exp( -0.5*arg*arg );
+      wfinBG[i] = yy;
+      
+      wfinSG[i] = spef.GetValue( xx );
+
+    }
+
+  FWfftBG = fftw_plan_dft_r2c_1d( N, wfinBG, wfoutBG, FFTW_ESTIMATE );
+  fftw_execute( FWfftBG );
+  fftw_destroy_plan( FWfftBG );
+
+  FWfftSG = fftw_plan_dft_r2c_1d( N, wfinSG, wfoutSG, FFTW_ESTIMATE );
+  fftw_execute( FWfftSG );
+  fftw_destroy_plan( FWfftSG );
+
+
+  fftw_complex wfout[M];
+  Double_t fftout[N];
+  
+  for ( UInt_t i=0; i<M; i++ )
+    {
+      Double_t amp_BG = sqrt( pow( wfoutBG[i][0], 2.0 )+pow( wfoutBG[i][1], 2.0 ) );
+      Double_t ph_BG = fftPhase( wfoutBG[i][1], wfoutBG[i][0] );
+
+      Double_t amp_SG = sqrt( pow( wfoutSG[i][0], 2.0 )+pow( wfoutSG[i][1], 2.0 ) );
+      Double_t ph_SG = fftPhase( wfoutSG[i][1], wfoutSG[i][0] );
+            
+      double ph = ( ph_BG + 1.0*n*ph_SG*step );
+      
+      wfout[i][0] = amp_BG*pow( amp_SG, 1.0*n*1.0 )*TMath::Cos( ph );
+      wfout[i][1] = amp_BG*pow( amp_SG, 1.0*n*1.0 )*TMath::Sin( ph );
+      
+    }
+  
+  fftw_plan BWfft;
+  BWfft = fftw_plan_dft_c2r_1d( N, wfout, fftout, FFTW_ESTIMATE );
+  fftw_execute( BWfft );
+  fftw_destroy_plan( BWfft );
+  
+  
+  Double_t x[nbins];
+  Double_t y[nbins];
+  
+  for ( Int_t i=0; i<nbins; i++ )
+    {
+      x[i] = xvalues.at( i );
+      Double_t y_ = Norm * wbin * TMath::Exp( -1.0*mu )/TMath::Factorial( n ) * pow( mu, 1.0*n*1.0 ) * fftout[i]/( 1.0*N*1.0 );
+
+      if ( y_<1.0e-10 ) y[i] = 1.e-4;
+      else y[i] = y_;
+            
+    }
+
+  TGraph *_gr = new TGraph( nbins, x, y );
+
+  _gr->SetLineWidth( 2 );
+  _gr->SetLineStyle( 2 );
+  _gr->SetLineColor( kBlack );
+  _gr->SetMarkerColor( kBlack );
+  _gr->SetMarkerSize( 0.1 );
   
   return _gr;
   
