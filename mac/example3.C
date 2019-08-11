@@ -38,7 +38,7 @@ Int_t example3()
   Pedestal ped( Q0, s0 );
   
   Double_t lambda = 1.0/40.0;
-  Double_t theta = 7.0;
+  Double_t theta = 6.5;
   Double_t alpha = 1.0/20.0;
   Double_t w = 0.2;
   Double_t p[4] = { lambda, theta, alpha, w };

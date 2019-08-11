@@ -38,7 +38,7 @@ Int_t example2()
   Pedestal ped( Q0, s0 );
   
   Double_t Q = 40.0;
-  Double_t s = 14.0;
+  Double_t s = 13.0;
   Double_t alpha = 1.0/20.0;
   Double_t w = 0.2;
   Double_t p[4] = { Q, s, alpha, w };
