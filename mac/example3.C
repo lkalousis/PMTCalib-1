@@ -49,7 +49,7 @@ Int_t example3()
   Double_t xmax = 480.0;
     
   PMT specimen( nbins, xmin, xmax, ped, gamma );
-  Double_t mu = 1.0;
+  Double_t mu = 1.2;
   Int_t ntot = 1.0e+6;
   specimen.GenSpectrum( ntot, mu );
   specimen.DrawSpectrum();

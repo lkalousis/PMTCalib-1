@@ -38,7 +38,7 @@ double fit_func_fft( const double *x )
   for ( Int_t i=0; i<N; i++ )
     {
       Double_t val = dft0.GetValue( xx0[i] );
-      if ( val<1.0e-10 ) val = 1.0e-4;
+      if ( val<1.0e-10 ) val = 1.0e-8;
       
       result += pow( val-yy0[i], 2.0 )/( val );
             
@@ -61,7 +61,7 @@ double fit_func_mod( const double *x )
   for ( Int_t i=0; i<N; i++ )
     {
       Double_t val = mod0.GetValue( xx0[i] );
-      if ( val<1.0e-10 ) val = 1.0e-4;
+      //if ( val<1.0e-10 ) val = 1.0e-4;
       
       result += pow( val-yy0[i], 2.0 )/( val );
             
