@@ -69,7 +69,7 @@ Double_t PMTModel::F1( Double_t xx )
   
   Double_t arg0 = 0.0; 
   if ( s0!=0.0 ) arg0 = ( xx - Q0 )/s0;    
-  else cout << "Error: The code tries to divide by zero, 0" << endl;
+  else cout << "Error: The code tries to divide by zero ! " << endl;
   
   result += TMath::Exp( -mu )/( sqrt( 2.0*TMath::Pi() )*s0 )*TMath::Exp( -0.5*arg0*arg0 );
   
@@ -77,7 +77,7 @@ Double_t PMTModel::F1( Double_t xx )
   Double_t sp = sqrt( pow( s0, 2.0 ) + pow( s1, 2.0 ) );
   Double_t argp = 0.0; 
   if ( sp!=0.0 ) argp = ( xx - Q0 - Q1 )/sp;    
-  else cout << "Error: The code tries to divide by zero, p" << endl;
+  else cout << "Error: The code tries to divide by zero ! " << endl;
   
   Double_t S1 = w/2.0*alpha*TMath::Exp( ( 2.0*( Q0-xx )+s0*s0*alpha )/2.0*alpha )*( 1.0-TMath::Erf( ( Q0 - xx + s0*s0*alpha )/( sqrt(2.0)*s0 ) ) );
   S1 += (1.0-w)/( sqrt( 2.0*TMath::Pi() )*sp )*TMath::Exp( -0.5*argp*argp );
@@ -93,7 +93,7 @@ Double_t PMTModel::F1( Double_t xx )
             
       Double_t argn = 0.0; 
       if ( sn!=0.0 ) argn = ( xx - Q0 - Qn )/sn;    
-      else cout << "Error: The code tries to divide by zero, 1 " << endl;
+      else cout << "Error: The code tries to divide by zero ! " << endl;
       
       result += TMath::Exp( -mu )*pow( mu, n )/TMath::Factorial( n )/( sqrt( 2.0*TMath::Pi() )*sn ) * TMath::Exp( -0.5*argn*argn );
             
@@ -124,7 +124,7 @@ Double_t PMTModel::F2( Double_t xx )
 
   Double_t arg0 = 0.0; 
   if ( s0!=0.0 ) arg0 = ( xx - Q0 )/s0;    
-  else cout << "Error: The code tries to divide by zero, 0" << endl;
+  else cout << "Error: The code tries to divide by zero !" << endl;
   
   result += TMath::Exp( -mu )/( sqrt( 2.0*TMath::Pi() )*s0 )*TMath::Exp( -0.5*arg0*arg0 );
   
@@ -132,7 +132,7 @@ Double_t PMTModel::F2( Double_t xx )
   Double_t sp = sqrt( pow( s0, 2.0 ) + pow( s1, 2.0 ) );
   Double_t argp = 0.0; 
   if ( sp!=0.0 ) argp = ( xx - Q0 - Q1 )/sp;    
-  else cout << "Error: The code tries to divide by zero, p" << endl;
+  else cout << "Error: The code tries to divide by zero !" << endl;
   
   Double_t S1 = w/2.0*alpha*TMath::Exp( ( 2.0*( Q0-xx )+s0*s0*alpha )/2.0*alpha )*( 1.0-TMath::Erf( ( Q0 - xx + s0*s0*alpha )/( sqrt(2.0)*s0 ) ) );
   S1 += (1.0-w)/( sqrt( 2.0*TMath::Pi() )*sp )*TMath::Exp( -0.5*argp*argp );
@@ -160,7 +160,7 @@ Double_t PMTModel::F2( Double_t xx )
       
       Double_t argn = 0.0; 
       if ( sn!=0.0 ) argn = ( xx - Q0 - Qn )/sn;    
-      else cout << "Error: The code tries to divide by zero, 1 " << endl;
+      else cout << "Error: The code tries to divide by zero ! " << endl;
       
       result += TMath::Exp( -mu )*pow( mu, n )/TMath::Factorial( n )/( sqrt( 2.0*TMath::Pi() )*sn ) * TMath::Exp( -0.5*argn*argn );
       
