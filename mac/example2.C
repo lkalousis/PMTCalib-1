@@ -94,9 +94,9 @@ Int_t example2()
   TGraph *grBF = dft.GetGraph();
   grBF->Draw( "SAME,L" );
 
-  TGraph *grPE[10];
+  TGraph *grPE[25];
     
-  for ( Int_t i=0; i<10; i++ )
+  for ( Int_t i=0; i<25; i++ )
     {
       grPE[i] = dft.GetGraphN( i );
       grPE[i]->Draw( "SAME,L" );

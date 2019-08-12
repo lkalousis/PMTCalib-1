@@ -84,7 +84,7 @@ Double_t PMTModel::F1( Double_t xx )
   
   result += TMath::Exp( -mu )*pow( mu, 1.0 )/TMath::Factorial( 1.0 )*S1;
   
-  for ( Int_t n=2; n<20; n++ )
+  for ( Int_t n=2; n<25; n++ )
     {
       Double_t Qn = 1.0*n*( w/alpha+(1.0-w)*Q1 );
       //Double_t Qn = 1.0*n*Q1 + w/alpha;
@@ -152,7 +152,7 @@ Double_t PMTModel::F2( Double_t xx )
   
   result += TMath::Exp( -mu )*pow( mu, 2.0 )/TMath::Factorial( 2.0 )*S2;
   
-  for ( Int_t n=3; n<20; n++ )
+  for ( Int_t n=3; n<25; n++ )
     {
       Double_t Qn = 1.0*n*( w/alpha+(1.0-w)*Q1 );
       Double_t sn = sqrt( pow( s0, 2.0 ) + 1.0*n*( (1.0-w)*pow(s1,2.0)+w*pow(1.0/alpha,2.0)+(1.0-w)*w*pow( Q1-1.0/alpha, 2.0 )  )   );
