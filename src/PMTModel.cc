@@ -140,12 +140,12 @@ Double_t PMTModel::F2( Double_t xx )
   result += TMath::Exp( -mu )*pow( mu, 1.0 )/TMath::Factorial( 1.0 )*S1;
   
   
-  Double_t S2 = 0.0;//pow( w/lambda, 2.0 )*xx*TMath::Exp( -xx/lambda );
+  Double_t S2 = 0.0;
 
   Double_t spp = sqrt( pow( s0, 2.0 ) + 2.0*pow( s1, 2.0 ) );
   Double_t argpp = 0.0; 
   if ( spp!=0.0 ) argpp = ( xx - Q0 - 2.0*Q1 )/spp;    
-  else cout << "Error: The code tries to divide by zero, p" << endl;
+  else cout << "Error: The code tries to divide by zero, pp" << endl;
     
   S2 += pow( 1.0-w, 2.0 )/( sqrt( 2.0*TMath::Pi() )*spp )*TMath::Exp( -0.5*argpp*argpp );
   S2 += 2.0*w*(1.0-w)/2.0*alpha*TMath::Exp( ( 2.0*( Q1+Q0-xx )+(s0*s0+s1*s1)*alpha )/2.0*alpha )*( 1.0-TMath::Erf( ( Q1+Q0-xx + (s0*s0+s1*s1)*alpha )/( sqrt(2.0)*sqrt(s0*s0+s1*s1) ) ) );

@@ -12,6 +12,8 @@ double wbin0;
 DFTmethod dft0;
 PMTModel mod0;
 
+Int_t Nb;
+
 double fit_func_fft( const double *x )
 {
   double result = 0.0;
@@ -38,9 +40,9 @@ double fit_func_fft( const double *x )
   for ( Int_t i=0; i<N; i++ )
     {
       Double_t val = dft0.GetValue( xx0[i] );
-      if ( val<1.0e-10 ) val = 1.0e-8;
+      if ( val<1.0e-5 ) val = 1.0e-5;
       
-      result += pow( val-yy0[i], 2.0 )/( val );
+      if ( yy0[i]>0 ) result += pow( val-yy0[i], 2.0 )/( yy0[i] );
             
     }
     
@@ -61,9 +63,9 @@ double fit_func_mod( const double *x )
   for ( Int_t i=0; i<N; i++ )
     {
       Double_t val = mod0.GetValue( xx0[i] );
-      if ( val<1.0e-10 ) val = 1.0e-8;
+      if ( val<1.0e-5 ) val = 1.0e-5;
       
-      result += pow( val-yy0[i], 2.0 )/( val );
+      if ( yy0[i]>0 ) result += pow( val-yy0[i], 2.0 )/( yy0[i] );
             
     }
     
@@ -155,13 +157,21 @@ void SPEFitter::FitwDFTmethod( TH1D *hspec )
 {
   N = hspec->GetXaxis()->GetNbins();
   wbin0 = hspec->GetXaxis()->GetBinWidth(1);
+
+  
+  fit_status=-1;
+  
+  Nb=0;
   
   for ( Int_t i=0; i<N; i++ )
     {
       xx0[i] = hspec->GetXaxis()->GetBinCenter( i+1 );
       yy0[i] = hspec->GetBinContent( i+1 );
+
+      if ( yy0[i]>0 ) Nb++;
       
     }
+
   
   mFFT = new ROOT::Minuit2::Minuit2Minimizer();
   
@@ -234,7 +244,7 @@ void SPEFitter::FitwDFTmethod( TH1D *hspec )
             
     }
 
-  ndof = N-dft.spef.nparams-4; 
+  ndof = Nb-dft.spef.nparams-4; 
   cout << " * " << setw(10) << "NDOF" << " : " << ndof << endl;
   
   chi2r = mFFT->MinValue()/( ndof );
@@ -251,11 +261,18 @@ void SPEFitter::FitwPMTModel( TH1D *hspec )
 {
   N = hspec->GetXaxis()->GetNbins();
   wbin0 = hspec->GetXaxis()->GetBinWidth(1);
+
+  
+  fit_status=-1;
+
+  Nb=0;
   
   for ( Int_t i=0; i<N; i++ )
     {
       xx0[i] = hspec->GetXaxis()->GetBinCenter( i+1 );
       yy0[i] = hspec->GetBinContent( i+1 );
+
+      if ( yy0[i]>0 ) Nb++;
       
     }
   
@@ -266,10 +283,10 @@ void SPEFitter::FitwPMTModel( TH1D *hspec )
   
   mMOD->SetFunction(FCA);
 
-  mMOD->SetLimitedVariable( 0, "Norm", mod.params[0], mod.params[0]*0.01, mod.params[0]*0.75, mod.params[0]*1.25 );
+  mMOD->SetLimitedVariable( 0, "Norm", mod.params[0], mod.params[0]*0.01, mod.params[0]*0.5, mod.params[0]*1.5 );
               
-  mMOD->SetLimitedVariable( 1, "Q0", mod.params[1], mod.params[1]*0.01, mod.params[1]-0.5*mod.params[2], mod.params[1]+0.5*mod.params[2] );
-  mMOD->SetLimitedVariable( 2, "s0", mod.params[2], mod.params[2]*0.01, mod.params[2]*0.9, mod.params[2]*1.1 );
+  mMOD->SetLimitedVariable( 1, "Q0", mod.params[1], mod.params[1]*0.01, mod.params[1]-0.75*mod.params[2], mod.params[1]+0.75*mod.params[2] );
+  mMOD->SetLimitedVariable( 2, "s0", mod.params[2], mod.params[2]*0.01, mod.params[2]*0.9+0.01, mod.params[2]*1.1 );
   
   mMOD->SetLimitedVariable( 3, "mu", mod.params[3], 0.01, mod.params[3]*0.1, mod.params[3]*3.0 );
   
@@ -330,7 +347,7 @@ void SPEFitter::FitwPMTModel( TH1D *hspec )
             
     }
 
-  ndof = N-mod.nparams;
+  ndof = Nb-mod.nparams;
   cout << " * " << setw(10) << "NDOF" << " : " << ndof << endl;
 
   chi2r = mMOD->MinValue()/( ndof ); 
