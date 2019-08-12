@@ -88,7 +88,7 @@ Double_t PMTModel::F1( Double_t xx )
     {
       Double_t Qn = 1.0*n*( w/alpha+(1.0-w)*Q1 );
       //Double_t Qn = 1.0*n*Q1 + w/alpha;
-      Double_t sn = sqrt( pow( s0, 2.0 ) + 1.0*n*( (1.0-w)*pow(s1,2.0)+w*pow(1.0/alpha,2.0)+(1.0-w)*w*pow( Q1-1.0/alpha, 2.0 )  )   );
+      Double_t sn = sqrt( pow( s0, 2.0 ) + 1.0*n*( (1.0-w)*pow(s1,2.0)+w*pow(1.0/alpha,2.0)+(1.0-w)*w*pow( Q1-1.0/alpha, 2.0 ) ) );
       //Double_t sn = sqrt( pow( s0, 2.0 ) + 1.0*n*pow( s1, 2.0 ) );
             
       Double_t argn = 0.0; 
@@ -155,7 +155,7 @@ Double_t PMTModel::F2( Double_t xx )
   for ( Int_t n=3; n<25; n++ )
     {
       Double_t Qn = 1.0*n*( w/alpha+(1.0-w)*Q1 );
-      Double_t sn = sqrt( pow( s0, 2.0 ) + 1.0*n*( (1.0-w)*pow(s1,2.0)+w*pow(1.0/alpha,2.0)+(1.0-w)*w*pow( Q1-1.0/alpha, 2.0 )  )   );
+      Double_t sn = sqrt( pow( s0, 2.0 ) + 1.0*n*( (1.0-w)*pow(s1,2.0)+w*pow(1.0/alpha,2.0)+(1.0-w)*w*pow( Q1-1.0/alpha, 2.0 )  )  );
       
       
       Double_t argn = 0.0; 
