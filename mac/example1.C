@@ -76,8 +76,8 @@ Int_t example1()
   TGraph *grBF = mod.GetGraph();
   grBF->Draw( "SAME,L" );
   
-  Double_t Gtrue = ( w*alpha+(1.0-w)*Q );
-  Double_t Gfit = ( fit.vals[7]*fit.vals[6]+(1.0-fit.vals[7])*fit.vals[4] ); 
+  Double_t Gtrue = ( w/alpha+(1.0-w)*Q );
+  Double_t Gfit = ( fit.vals[7]/fit.vals[6]+(1.0-fit.vals[7])*fit.vals[4] ); 
   
   cout << " True Gain : " << Gtrue << endl;
   cout << " BF Gain   : " << Gfit  << endl;

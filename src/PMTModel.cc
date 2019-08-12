@@ -189,10 +189,11 @@ TGraph* PMTModel::GetGraph()
     }
   
   TGraph *_gr = new TGraph( nbins, x, y );
-
+  
   _gr->SetLineWidth( 2 );
-  _gr->SetLineColor( kBlue );
-  _gr->SetMarkerColor( kBlue );
+  int cc = kAzure+1;
+  _gr->SetLineColor( cc );
+  _gr->SetMarkerColor( cc );
   _gr->SetMarkerSize( 0.1 );
   
   return _gr;

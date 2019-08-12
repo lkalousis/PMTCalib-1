@@ -170,9 +170,9 @@ void SPEFitter::FitwDFTmethod( TH1D *hspec )
   
   mFFT->SetFunction(FCA);
 
-  mFFT->SetLimitedVariable( 0, "Norm", dft.Norm, dft.Norm*0.01, dft.Norm*0.5, dft.Norm*1.5 );
+  mFFT->SetLimitedVariable( 0, "Norm", dft.Norm, dft.Norm*0.01, dft.Norm*0.75, dft.Norm*1.25 );
 
-  mFFT->SetLimitedVariable( 1, "Q0", dft.Q0, dft.Q0*0.01, dft.Q0*0.9, dft.Q0*1.1 );
+  mFFT->SetLimitedVariable( 1, "Q0", dft.Q0, dft.Q0*0.01, dft.Q0-0.5*dft.s0, dft.Q0+0.5*dft.s0 );
   mFFT->SetLimitedVariable( 2, "s0", dft.s0, dft.s0*0.01, dft.s0*0.9, dft.s0*1.1 );
   
   mFFT->SetLimitedVariable( 3, "mu", dft.mu, 0.01, dft.mu*0.1, dft.mu*3.0 );
@@ -265,9 +265,9 @@ void SPEFitter::FitwPMTModel( TH1D *hspec )
   
   mMOD->SetFunction(FCA);
 
-  mMOD->SetLimitedVariable( 0, "Norm", mod.params[0], mod.params[0]*0.01, mod.params[0]*0.5, mod.params[0]*1.5 );
+  mMOD->SetLimitedVariable( 0, "Norm", mod.params[0], mod.params[0]*0.01, mod.params[0]*0.75, mod.params[0]*1.25 );
               
-  mMOD->SetLimitedVariable( 1, "Q0", mod.params[1], mod.params[1]*0.01, mod.params[1]*0.9, mod.params[1]*1.1 );
+  mMOD->SetLimitedVariable( 1, "Q0", mod.params[1], mod.params[1]*0.01, mod.params[1]-0.5*mod.params[2], mod.params[1]+0.5*mod.params[2] );
   mMOD->SetLimitedVariable( 2, "s0", mod.params[2], mod.params[2]*0.01, mod.params[2]*0.9, mod.params[2]*1.1 );
   
   mMOD->SetLimitedVariable( 3, "mu", mod.params[3], 0.01, mod.params[3]*0.1, mod.params[3]*3.0 );

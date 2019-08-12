@@ -23,10 +23,10 @@ DFTmethod::DFTmethod( Int_t _nbins, Double_t _xmin, Double_t _xmax, SPEResponse 
   
   spef = _spef;
     
-  N = nbins+60;
-  //N = 2*nbins+2;
+  N = nbins+60; 
   M = N/2+1;
-    
+
+  
   xvalues.clear();
   
   for ( UInt_t i=0; i<N; i++ )
@@ -148,10 +148,11 @@ TGraph* DFTmethod::GetGraph()
     }
   
   TGraph *_gr = new TGraph( nbins, x, y );
-
+  
   _gr->SetLineWidth( 2 );
-  _gr->SetLineColor( kBlue );
-  _gr->SetMarkerColor( kBlue );
+  int cc = kAzure+1;
+  _gr->SetLineColor( cc );
+  _gr->SetMarkerColor( cc );
   _gr->SetMarkerSize( 0.1 );
     
   return _gr;
