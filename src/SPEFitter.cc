@@ -203,7 +203,7 @@ void SPEFitter::FitwDFTmethod( TH1D *hspec )
   if( mFFT->Status()!=0 )
     {
       cout << " * " << endl;
-      cout << " * Fit has failed ! " << endl;
+      cout << " * The fit has failed ! " << endl;
       cout << " * " << endl;
       
       return;
@@ -299,7 +299,7 @@ void SPEFitter::FitwPMTModel( TH1D *hspec )
   if( mMOD->Status()!=0 )
     {
       cout << " * " << endl;
-      cout << " * Fit has failed ! " << endl;
+      cout << " * The fit has failed ! " << endl;
       cout << " * " << endl;
       
       return;
