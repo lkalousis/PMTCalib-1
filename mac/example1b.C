@@ -43,12 +43,12 @@ Int_t example1b()
   Double_t p[4] = { Q, s, alpha, w };
   SPEResponse gaus( PMType::GAUSS, p );
 
-  Int_t nbins = 250;
+  Int_t nbins = 400;
   Double_t xmin = -20.0;
-  Double_t xmax = 480.0;
+  Double_t xmax = 780.0;
     
   PMT specimen( nbins, xmin, xmax, ped, gaus );
-  Double_t mu = 1.2;
+  Double_t mu = 4.0;
   Int_t ntot = 1.0e+6;
   specimen.GenSpectrum( ntot, mu );
   specimen.GetSpectrum()->SetStats(0);

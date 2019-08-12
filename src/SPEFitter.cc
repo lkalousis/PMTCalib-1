@@ -215,10 +215,11 @@ void SPEFitter::FitwDFTmethod( TH1D *hspec )
   cout << " * " << endl;
   cout << " * Minimization results "  << endl;
   cout << " * " << endl;
-  cout << " * No. of calls  : " << mFFT->NCalls() << endl;
-  cout << " * Fitter status : " << fit_status << endl;
+
+  cout << " * " << setw(10)  << "Calls" << " : " << mFFT->NCalls() << endl;
+  cout << " * " << setw(10)  << "Status" << " : " << fit_status << endl;
   cout << " * " << endl;
-  
+    
   Int_t ndim = mFFT->NDim();
   const double *pars = mFFT->X();  
   const double *erpars = mFFT->Errors();
@@ -310,8 +311,9 @@ void SPEFitter::FitwPMTModel( TH1D *hspec )
   cout << " * " << endl;
   cout << " * Minimization results "  << endl;
   cout << " * " << endl;
-  cout << " * No. of calls  : " << mMOD->NCalls() << endl;
-  cout << " * Fitter status : " << fit_status << endl;
+  
+  cout << " * " << setw(10)  << "Calls" << " : " << mMOD->NCalls() << endl;
+  cout << " * " << setw(10)  << "Status" << " : " << fit_status << endl;
   cout << " * " << endl;
   
   Int_t ndim = mMOD->NDim();
