@@ -50,7 +50,7 @@ Int_t example2()
     
   PMT specimen( nbins, xmin, xmax, ped, gaus );
   Double_t mu = 1.2;
-  Int_t ntot = 1.0e+6;
+  Int_t ntot = 1.0e+5;
   specimen.GenSpectrum( ntot, mu );
   specimen.GetSpectrum()->SetStats(0);
   specimen.DrawSpectrum();
