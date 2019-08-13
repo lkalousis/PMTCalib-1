@@ -202,7 +202,7 @@ void SPEFitter::FitwDFTmethod( TH1D *hspec )
   
   
   Int_t ifits = 0;
-  while( mFFT->Status()!=0 && ifits<10 )
+  while( mFFT->Status()!=0 && ifits<4 )
     { 
       mFFT->Minimize();
       mFFT->Hesse();
@@ -305,7 +305,7 @@ void SPEFitter::FitwPMTModel( TH1D *hspec )
   
   
   Int_t ifits = 0;
-  while( mMOD->Status()!=0 && ifits<10 )
+  while( mMOD->Status()!=0 && ifits<4 )
     { 
       mMOD->Minimize();
       mMOD->Hesse();
