@@ -61,7 +61,7 @@ Int_t example3()
   Double_t mu_test = fit.FindMu( specimen.GetSpectrum(), Q0, s0 );
   Double_t g_test = fit.FindG( specimen.GetSpectrum(), Q0, mu_test );
   
-  Double_t p_test[4] = { 1.0/g_test, 7.0, 1.0/(0.2*g_test), 0.2 };
+  Double_t p_test[4] = { 1.0/g_test, 7.0, 1.0/(0.5*g_test), 0.2 };
   
   SPEResponse gamma_test( PMType::GAMMA, p_test );
   DFTmethod dft( 2.0*nbins, xmin, xmax, gamma_test );

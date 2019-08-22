@@ -23,7 +23,7 @@ DFTmethod::DFTmethod( Int_t _nbins, Double_t _xmin, Double_t _xmax, SPEResponse 
   
   spef = _spef;
     
-  N = 2*nbins+2; 
+  N = 2*nbins+60; 
   M = N/2+1;
 
   

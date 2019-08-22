@@ -118,7 +118,7 @@ void SPEFitter::SetPMTModel( PMTModel _mod )
   
 }
 
-Double_t SPEFitter::FindMu( TH1D *hspec, Double_t _Q0, Double_t _s0 )
+Double_t SPEFitter::FindMu( TH1 *hspec, Double_t _Q0, Double_t _s0 )
 {
   ped_func = new TF1( "pmt_ped", m_g, _Q0-5.0*_s0, _Q0-5.0*_s0, 3 );
   ped_func->SetParNames( "Norm", "Q", "#sigma" );
@@ -145,7 +145,7 @@ Double_t SPEFitter::FindMu( TH1D *hspec, Double_t _Q0, Double_t _s0 )
   
 }
 
-Double_t SPEFitter::FindG( TH1D *hspec, Double_t _Q0, Double_t _mu )
+Double_t SPEFitter::FindG( TH1 *hspec, Double_t _Q0, Double_t _mu )
 {
   Double_t G = ( hspec->GetMean()-_Q0 )/_mu;
   
@@ -153,7 +153,7 @@ Double_t SPEFitter::FindG( TH1D *hspec, Double_t _Q0, Double_t _mu )
   
 }
 
-void SPEFitter::FitwDFTmethod( TH1D *hspec )
+void SPEFitter::FitwDFTmethod( TH1 *hspec )
 {
   N = hspec->GetXaxis()->GetNbins();
   wbin0 = hspec->GetXaxis()->GetBinWidth(1);
@@ -179,18 +179,18 @@ void SPEFitter::FitwDFTmethod( TH1D *hspec )
   FCA = ROOT::Math::Functor( &fit_func_fft, dft.spef.nparams+4 );
   
   mFFT->SetFunction(FCA);
-
+  
   mFFT->SetLimitedVariable( 0, "Norm", dft.Norm, dft.Norm*0.01, dft.Norm*0.75, dft.Norm*1.25 );
-
   mFFT->SetLimitedVariable( 1, "Q0", dft.Q0, dft.Q0*0.01, dft.Q0-0.5*dft.s0, dft.Q0+0.5*dft.s0 );
   mFFT->SetLimitedVariable( 2, "s0", dft.s0, dft.s0*0.01, dft.s0*0.9, dft.s0*1.1 );
   
-  mFFT->SetLimitedVariable( 3, "mu", dft.mu, 0.01, dft.mu*0.5, dft.mu*2.0 );
+  mFFT->SetLimitedVariable( 3, "mu", dft.mu, 0.01, dft.mu*0.3, dft.mu*3.0 );
   
   mFFT->SetLimitedVariable( 4, "PAR1", dft.spef.params[0], dft.spef.params[0]*0.001, dft.spef.params[0]*0.3, dft.spef.params[0]*3.0 );
   mFFT->SetLimitedVariable( 5, "PAR2", dft.spef.params[1], dft.spef.params[1]*0.01, dft.spef.params[1]*0.1, dft.spef.params[1]*10.0 );
-  mFFT->SetLimitedVariable( 6, "PAR3", dft.spef.params[2], dft.spef.params[2]*0.01, dft.spef.params[2]*0.01, dft.spef.params[2]*100.0 );
-  mFFT->SetLimitedVariable( 7, "PAR4", dft.spef.params[3], 0.01, 0.0, 0.5 );
+  mFFT->SetLimitedVariable( 6, "PAR3", dft.spef.params[2], dft.spef.params[2]*0.01, dft.spef.params[2]*0.01, dft.spef.params[2]*3.0 );
+  mFFT->SetLimitedVariable( 7, "PAR4", dft.spef.params[3], 0.01, 0.0, 0.55 );
+  
   
   mFFT->SetMaxFunctionCalls(1.E9);
   mFFT->SetMaxIterations(1.E9);
@@ -257,7 +257,7 @@ void SPEFitter::FitwDFTmethod( TH1D *hspec )
   
 }
 
-void SPEFitter::FitwPMTModel( TH1D *hspec )
+void SPEFitter::FitwPMTModel( TH1 *hspec )
 {
   N = hspec->GetXaxis()->GetNbins();
   wbin0 = hspec->GetXaxis()->GetBinWidth(1);
@@ -284,16 +284,16 @@ void SPEFitter::FitwPMTModel( TH1D *hspec )
   mMOD->SetFunction(FCA);
 
   mMOD->SetLimitedVariable( 0, "Norm", mod.params[0], mod.params[0]*0.01, mod.params[0]*0.75, mod.params[0]*1.25 );
-              
   mMOD->SetLimitedVariable( 1, "Q0", mod.params[1], mod.params[1]*0.01, mod.params[1]-0.5*mod.params[2], mod.params[1]+0.5*mod.params[2] );
   mMOD->SetLimitedVariable( 2, "s0", mod.params[2], mod.params[2]*0.01, mod.params[2]*0.9, mod.params[2]*1.1 );
   
-  mMOD->SetLimitedVariable( 3, "mu", mod.params[3], 0.01, mod.params[3]*0.5, mod.params[3]*2.0 );
+  mMOD->SetLimitedVariable( 3, "mu", mod.params[3], 0.01, mod.params[3]*0.3, mod.params[3]*3.0 );
   
   mMOD->SetLimitedVariable( 4, "PAR1", mod.params[4], mod.params[4]*0.001, mod.params[4]*0.3, mod.params[4]*3.0 );
   mMOD->SetLimitedVariable( 5, "PAR2", mod.params[5], mod.params[5]*0.01, mod.params[5]*0.1, mod.params[5]*10.0 );
-  mMOD->SetLimitedVariable( 6, "PAR3", mod.params[6], mod.params[6]*0.01, mod.params[6]*0.01, mod.params[6]*100.0 );
-  mMOD->SetLimitedVariable( 7, "PAR4", mod.params[7], 0.01, 0.0, 0.5 );
+  mMOD->SetLimitedVariable( 6, "PAR3", mod.params[6], mod.params[6]*0.01, mod.params[6]*0.01, mod.params[6]*3.0 );
+  mMOD->SetLimitedVariable( 7, "PAR4", mod.params[7], 0.01, 0.0, 0.55 );
+  
   
   mMOD->SetMaxFunctionCalls(1.E9);
   mMOD->SetMaxIterations(1.E9);
