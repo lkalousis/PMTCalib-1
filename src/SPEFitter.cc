@@ -184,7 +184,7 @@ void SPEFitter::FitwDFTmethod( TH1 *hspec )
   mFFT->SetLimitedVariable( 1, "Q0", dft.Q0, dft.Q0*0.01, dft.Q0-0.5*dft.s0, dft.Q0+0.5*dft.s0 );
   mFFT->SetLimitedVariable( 2, "s0", dft.s0, dft.s0*0.01, dft.s0*0.9, dft.s0*1.1 );
   
-  mFFT->SetLimitedVariable( 3, "mu", dft.mu, 0.01, dft.mu*0.3, dft.mu*3.0 );
+  mFFT->SetLimitedVariable( 3, "mu", dft.mu, 0.01, dft.mu*0.5, dft.mu*2.0 );
   
   mFFT->SetLimitedVariable( 4, "PAR1", dft.spef.params[0], dft.spef.params[0]*0.001, dft.spef.params[0]*0.3, dft.spef.params[0]*3.0 );
   mFFT->SetLimitedVariable( 5, "PAR2", dft.spef.params[1], dft.spef.params[1]*0.01, dft.spef.params[1]*0.1, dft.spef.params[1]*10.0 );
