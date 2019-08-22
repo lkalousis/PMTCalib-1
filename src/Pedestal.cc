@@ -90,7 +90,8 @@ void Pedestal::LocatePedestal( TH1 *hspec, Double_t _Q0, Double_t _s0 )
   pedfit->SetParameter( 2, _s0 );
   pedfit->SetParLimits( 2, _s0*0.1, _s0*10.0 );
   
-  status = hspec->Fit( "pedfit", "Q0", "", _Q0-3.0*_s0, _Q0+3.0*_s0 );
+  status = hspec->Fit( "pedfit", "Q0", "", _Q0-3.0*_s0, _Q0+2.6*_s0 );
+  //status = hspec->Fit( "pedfit", "Q0", "", _Q0-8.0*_s0, _Q0+8.0*_s0 ); // Config. or MUTEL 
   chi2 = pedfit->GetChisquare();
   //pedfit->GetNDF();
   
