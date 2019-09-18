@@ -28,7 +28,7 @@ class SPEFitter : public TObject
  private:
 
   DFTmethod dft;
-  ROOT::Minuit2::Minuit2Minimizer *mFFT;
+  //ROOT::Minuit2::Minuit2Minimizer *mFFT;
     
   PMTModel mod;
   ROOT::Minuit2::Minuit2Minimizer *mMOD;
@@ -41,6 +41,9 @@ class SPEFitter : public TObject
   
   virtual ~SPEFitter();
 
+  ROOT::Minuit2::Minuit2Minimizer *mFFT;
+
+  
   Int_t fit_status;
   
   Double_t vals[20];
