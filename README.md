@@ -1,6 +1,7 @@
+
 # PMTCalib : A framework for photomultiplier tube (PMT) calibration
 
-More details to be added soon !!!
+The PMTCalib package is ...
 
 
 Leonidas N. Kalousis
