@@ -9,6 +9,6 @@ namespace PMType
   enum Model { SIMPLEGAUSS1, SIMPLEGAUSS2 };
     
   
-};
+}
  
 #endif

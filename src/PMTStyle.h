@@ -13,6 +13,6 @@ namespace PMTStyle
 {
   extern void SetDefaultStyle();
     
-};
+}
 
 #endif
