@@ -68,3 +68,7 @@ clean	:
 	@rm -f ./$(lib:.so=.rootmap)
 
 fresh 	: clean all 
+
+.PHONY: examples
+examples:
+	make -C examples all
