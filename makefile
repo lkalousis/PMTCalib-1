@@ -78,4 +78,4 @@ fresh 	: clean all
 
 .PHONY: examples
 examples:
-	make -C examples all
+	@make -C examples all
