@@ -19,3 +19,7 @@ all: $(exec)
 
 %.exe: %.cxx
 	$(CXX) $(INCLUDES) $(LIBS) -o $@ $<
+
+.PHONY: clean
+clean:
+	$(RM) $(exec)

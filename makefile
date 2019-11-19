@@ -72,6 +72,7 @@ clean	:
 	@rm -f ./$(lib)
 	@rm -f ./$(lib:.so=_rdict.pcm)
 	@rm -f ./$(lib:.so=.rootmap)
+	@make -C examples clean
 
 fresh 	: clean all 
 
