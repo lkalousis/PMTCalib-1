@@ -13,15 +13,21 @@ srcs = $(wildcard src/*.cc)
 head = $(wildcard src/*.h)
 objs = $(srcs:.cc=.o)
 
-cxx = g++
+cxx = $(shell root-config --cxx)
 cxxflags = -g -W -O -Wall -Wno-deprecated -Werror -fPIC -std=c++1y
 
 incflags = -I.
-incflags += `root-config --cflags` `gsl-config --cflags` -I/$(PMTCALIB)/src/ 
+incflags += $(shell root-config --cflags | sed -e "s/-I/-isystem/g")
+GSL_PREFIX=$(shell gsl-config --prefix)
+ifneq ($(GSL_PREFIX),/usr)
+	incflags += $(shell gsl-config --cflags | sed -e "s/-I/-isystem/g")
+endif
 
-so = g++
+so = $(shell root-config --ld)
 soflags = -g -shared -fPIC
-libs = `root-config --libs` -lMinuit -lMinuit2 -lGeom -lXMLIO -lfftw3 `gsl-config --libs`
+libs += $(shell root-config --ldflags --libs) -lMinuit -lMinuit2 -lGeom -lXMLIO
+libs += -lfftw3
+libs += `gsl-config --libs`
 
 all	: start $(dict).cc $(objs) $(lib) end
 
