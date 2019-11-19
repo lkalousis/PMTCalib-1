@@ -17,11 +17,11 @@ cxx = g++
 cxxflags = -g -W -O -Wall -Wno-deprecated -Werror -fPIC -std=c++1y
 
 incflags = -I.
-incflags += -I$(ROOTSYS)/include/ -I/$(GSL)/include/ -I/$(PMTCALIB)/src/ 
+incflags += `root-config --cflags` `gsl-config --cflags` -I/$(PMTCALIB)/src/ 
 
 so = g++
 soflags = -g -shared -fPIC
-libs = $(ROOTLIBS) -lMinuit -lMinuit2 -lGeom -lXMLIO -lfftw3 -L/$(GSL)/ -lgsl -lgslcblas 
+libs = `root-config --libs` -lMinuit -lMinuit2 -lGeom -lXMLIO -lfftw3 `gsl-config --libs`
 
 all	: start $(dict).cc $(objs) $(lib) end
 
