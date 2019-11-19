@@ -11,7 +11,7 @@ INCLUDES += $(PMTCalib_include)
 LIBS += $(ROOT_LIBS)
 LIBS += $(PMTCalib_lib)
 
-src_files=$(shell ls *.cxx)
+src_files=$(wildcard *.cxx)
 
 exec=$(src_files:.cxx=.exe)
 
