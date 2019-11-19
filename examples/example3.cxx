@@ -16,19 +16,23 @@
 using std::cout;
 using std::endl;
 
+#include<chrono>
+using std::chrono::high_resolution_clock;
+using std::chrono::duration;
+using std::chrono::duration_cast;
+
+
 int main(int argc, char ** argv)
 {
   TApplication *myapp=new TApplication("myapp",&argc,argv);
 
-  time_t start;  
-  
-  time( &start );
   
   cout << "" << endl;
   
   cout << " The macro starts ( example3.C ) ... " << endl;
 
   cout << "" << endl;
+
 
   gROOT->Reset();
   
@@ -62,6 +66,8 @@ int main(int argc, char ** argv)
   specimen.DrawSpectrum();
   
   
+  high_resolution_clock::time_point start = high_resolution_clock::now();
+
   SPEFitter fit;
 
   Double_t mu_test = fit.FindMu( specimen.GetSpectrum(), Q0, s0 );
@@ -95,6 +101,8 @@ int main(int argc, char ** argv)
   Double_t p_fit[4] = { fit.vals[4], fit.vals[5], fit.vals[6], fit.vals[7] };
   dft.spef.SetParams( p_fit );
   
+  high_resolution_clock::time_point end = high_resolution_clock::now();
+
   TGraph *grBF = dft.GetGraph();
   grBF->Draw( "SAME,L" );
 
@@ -111,6 +119,7 @@ int main(int argc, char ** argv)
   Double_t Gtrue = ( w/alpha+(1.0-w)/lambda );
   Double_t Gfit = ( fit.vals[7]/fit.vals[6]+(1.0-fit.vals[7])/fit.vals[4] ); 
   
+  
   cout << " True Gain : " << Gtrue << endl;
   cout << " BF Gain   : " << Gfit  << endl;
   cout << " Deviation : " << ( Gfit/Gtrue - 1.0 )*100.0 << endl;
@@ -125,15 +134,10 @@ int main(int argc, char ** argv)
 	  
   cout << "" << endl;
   
-  time_t end;      
-  
-  time( &end );
       
-  Int_t dura = difftime( end, start );      
-   
-  Int_t min = dura / 60; Int_t sec = dura % 60;
+  duration<double> dura = duration_cast<duration<double>>(end-start);
     
-  cout << " ---> "<< Form( "%02d:%02d", min, sec ) << endl;  
+  cout << " ---> "<< dura.count() << " seconds" << endl;  
     
   cout << "" << endl;
 
