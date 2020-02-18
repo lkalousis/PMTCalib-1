@@ -22,6 +22,7 @@ GSL_PREFIX=$(shell gsl-config --prefix)
 ifneq ($(GSL_PREFIX),/usr)
 	incflags += $(shell gsl-config --cflags | sed -e "s/-I/-isystem/g")
 endif
+incflags += -I/$(PMTCALIB)/src/
 
 so = $(shell root-config --ld)
 soflags = -g -shared -fPIC
