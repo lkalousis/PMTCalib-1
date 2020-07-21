@@ -181,14 +181,14 @@ void SPEFitter::FitwDFTmethod( TH1 *hspec )
   mFFT->SetFunction(FCA);
   
   mFFT->SetLimitedVariable( 0, "Norm", dft.Norm, dft.Norm*0.01, dft.Norm*0.75, dft.Norm*1.25 );
-  mFFT->SetLimitedVariable( 1, "Q0", dft.Q0, TMath::Abs( dft.Q0 )*0.01, dft.Q0-0.5*dft.s0, dft.Q0+0.5*dft.s0 );
+  mFFT->SetLimitedVariable( 1, "Q0", dft.Q0, TMath::Abs( dft.Q0 )*0.01+0.01, dft.Q0-0.5*dft.s0, dft.Q0+0.5*dft.s0 );
   mFFT->SetLimitedVariable( 2, "s0", dft.s0, dft.s0*0.01, dft.s0*0.9, dft.s0*1.1 );
   
   mFFT->SetLimitedVariable( 3, "mu", dft.mu, 0.01, dft.mu*0.5, dft.mu*2.0 );
   
   mFFT->SetLimitedVariable( 4, "PAR1", dft.spef.params[0], dft.spef.params[0]*0.001, dft.spef.params[0]*0.3, dft.spef.params[0]*3.0 );
-  mFFT->SetLimitedVariable( 5, "PAR2", dft.spef.params[1], dft.spef.params[1]*0.01, dft.spef.params[1]*0.1, dft.spef.params[1]*8.0 );
-  mFFT->SetLimitedVariable( 6, "PAR3", dft.spef.params[2], dft.spef.params[2]*0.01, dft.spef.params[2]*0.01, dft.spef.params[2]*5.0 );
+  mFFT->SetLimitedVariable( 5, "PAR2", dft.spef.params[1], dft.spef.params[1]*0.001, dft.spef.params[1]*0.1, dft.spef.params[1]*8.0 );
+  mFFT->SetLimitedVariable( 6, "PAR3", dft.spef.params[2], dft.spef.params[2]*0.001, dft.spef.params[2]*0.01, dft.spef.params[2]*5.0 );
   mFFT->SetLimitedVariable( 7, "PAR4", dft.spef.params[3], 0.01, 0.0, 0.65 );
   
   
@@ -284,7 +284,7 @@ void SPEFitter::FitwPMTModel( TH1 *hspec )
   mMOD->SetFunction(FCA);
 
   mMOD->SetLimitedVariable( 0, "Norm", mod.params[0], mod.params[0]*0.01, mod.params[0]*0.75, mod.params[0]*1.25 );
-  mMOD->SetLimitedVariable( 1, "Q0", mod.params[1], TMath::Abs( mod.params[1] )*0.01, mod.params[1]-0.5*mod.params[2], mod.params[1]+0.5*mod.params[2] );
+  mMOD->SetLimitedVariable( 1, "Q0", mod.params[1], TMath::Abs( mod.params[1] )*0.01+0.01, mod.params[1]-0.5*mod.params[2], mod.params[1]+0.5*mod.params[2] );
   mMOD->SetLimitedVariable( 2, "s0", mod.params[2], mod.params[2]*0.01, mod.params[2]*0.9, mod.params[2]*1.1 );
   
   mMOD->SetLimitedVariable( 3, "mu", mod.params[3], 0.01, mod.params[3]*0.3, mod.params[3]*3.0 );

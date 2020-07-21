@@ -31,13 +31,13 @@ DFTmethod::DFTmethod( Int_t _nbins, Double_t _xmin, Double_t _xmax, SPEResponse 
   
   for ( UInt_t i=0; i<N; i++ )
     {
-      Double_t xx = xmin + step/2.0 + 1.0*i*step;
+      Double_t xx = xmin + 1.0*i*step;
       
       xvalues.push_back( xx );
       
     }
 
-  edge = xmin + step/2.0;
+  edge = xmin;
   
     
 }
