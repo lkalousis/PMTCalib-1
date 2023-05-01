@@ -5,4 +5,4 @@ The PMTCalib package is ...
 
 
 Leonidas N. Kalousis
-leonidas.kalousis@iphc.cnrs.fr
+leonidas.kalousis@gmail.com
